@@ -1,0 +1,22 @@
+name: MLOps - concept drift
+
+python_env: python_env.yaml
+
+entry_points:
+  prepare_train_dataset:
+    command: "python cmd/prepare_train_dataset.py"
+
+  prepare_test_dataset:
+    command: "python cmd/prepare_test_dataset.py"
+
+  prepare_experiments_dataset:
+    command: "python cmd/prepare_experiments_dataset.py"
+
+  train:
+    command: "python cmd/train.py"
+
+  test:
+    command: "python cmd/test.py"
+
+  main:
+    command: "python cmd/main.py"

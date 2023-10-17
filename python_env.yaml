@@ -1,0 +1,12 @@
+# Python version required to run the project.
+python: "3.10"
+
+# Dependencies required to build packages. This field is optional.
+build_dependencies:
+  - pip
+  - setuptools
+
+# Dependencies required to run the project.
+dependencies:
+  - mlflow
+  - tensorflow==2.13

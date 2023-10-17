@@ -1,0 +1,6 @@
+*.pyc
+venv
+__pycache__
+model_files/dataset
+model_files/cnn_model
+model_files/cnn_stats

@@ -1,0 +1,45 @@
+{
+  "cnn_name": "SARS_Fapesc_Only_Covid_2_Patiente_10_based_on_EfficientNetB4_v0",
+  "input_shape": [224, 224, 3],
+  "classes": ["covid", "normal", "pneumonia bacterial"],
+  "__dataset_test_divided__": "if True indicate the test dataset is provided by dataset, if False it's necessary to split from train samples",
+  "dataset_test_divided": "True",
+  "pretrained_weights": "imagenet",
+  "__trainable_layers_comment__": "if True it means that exist a defined subset test, otherwise the dataset will be divided in two subsets: train and test",
+  "trainable_layers": "True",
+  "__data_augmentation_comment__": "True or False",
+  "data_augmentation": "True",
+  "training_epochs": 50,
+  "__batch_size_comment__": "A number. e.g: 128",
+  "batch_size": "64",
+  "__optimizer_comment__": "Adam, Adadelta or Adagrad",
+  "optimizer": "Adam",
+  "__learning_rate_comment__": "None or a value. e.g: 1e-5",
+  "learning_rate": "None",
+  "__patience_comment__": "True, False or a patience value. True is the default value (0.075)",
+  "patience": "0.075",
+  "loss_function": "categorical_crossentropy",
+  "training_metrics": "accuracy",
+  "classifier_layers": [
+    { "layer": "GlobalAveragePooling2D", "name": "avg_pool" },
+    { "layer": "BatchNormalization", "name": "batch_1" },
+    { "layer": "Dropout", "rate": 0.2, "name": "dropout_1" },
+    {
+      "layer": "Dense",
+      "units": 1024,
+      "activation": "relu",
+      "name": "dense_1"
+    },
+    { "layer": "Dropout", "rate": 0.2, "name": "dropout_2" },
+    { "layer": "Dense", "units": 512, "activation": "relu", "name": "dense_2" },
+    { "layer": "Dropout", "rate": 0.2, "name": "dropout_3" },
+    { "layer": "Dense", "units": 64, "activation": "relu", "name": "dense_3" },
+    { "layer": "Dropout", "rate": 0.2, "name": "dropout_4" },
+    {
+      "layer": "Dense",
+      "units": 3,
+      "activation": "softmax",
+      "name": "pred_layer"
+    }
+  ]
+}

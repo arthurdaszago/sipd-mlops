@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  sipd-mipd:
+    container_name: sipd-mipd
+    ports:
+      - "5000:5000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      # CNN
+      - CNN_PATH_ROOT=/home/sipd
+      - CNN_CONFIG_FILE=/home/sipd/model_files/config/sars_cnn_config_based_on_efficientNetB2.json
+      - LOGGING_FILE=/home/sipd/logs/sipd.log
+      - TRAINING_DATASET=/home/sipd/training_dataset # Dataset de treinamento mapeado no volume
+      - H5_DATASET_PATH=/home/sipd/model_files/dataset/
+      - H5_DATASET_FILENAME=dataset_224_224_3.h5
+      - CNN_MODEL_PATH=/home/sipd/model_files/cnn_model/
+      - CNN_STATS_PATH=/home/sipd/model_files/cnn_stats/
+      # MIPD
+      - MIPD_PATH_ROOT=/home/sipd
+      - MIPD_TIMING_WAIT=30
+      - MIPD_GPU_BATCH_SIZE=512
+      - CNN_CONFIG_FILE=configurationFiles/config/cnn_config_file.json
+      - LOGGING_FILE=/home/sipd/logs/mipd.log
+      - REPOSITORY_FILES=/home/sipd/repository
+    volumes:
+      # CNN
+      - sipd-logs:/home/sipd/logs:rw
+      # Mapeamento do dataset de treinamento da CNN
+      - /home/azago/dataset/:/home/sipd/training_dataset:ro
+      - /home/azago/mlops/sipd-cnn-mlops/model_files/:/home/sipd/model_files:rw
+      # MIPD
+      - logs:/home/sipd/logs
+      - repository:/home/sipd/repository
+
+    networks:
+      # - sipd-cnn
+      - sipd-mipd
+
+volumes:
+  # sipd-logs:
+  repository:
+  logs:
+  mipd-test:
+
+networks:
+  # sipd-cnn:
+  sipd-mipd:
