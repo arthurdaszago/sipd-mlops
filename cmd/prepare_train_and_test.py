@@ -24,7 +24,7 @@ mask_individual = np.isin(train_labels, individual_classes)
 mask_others = np.isin(train_labels, other_classes)
 
 images_individual = train_images[mask_individual.squeeze()]
-labels_individual = train_labels[mask_individual.squeeze()]
+labels_individual = np.array([individual_classes.index(label[0]) for label in train_labels[mask_individual.squeeze()]]).reshape(-1, 1)  # Convertendo rótulos para o novo sistema
 
 images_others = train_images[mask_others.squeeze()]
 labels_others = np.full(shape=images_others.shape[0], fill_value=3).reshape(-1, 1)  # Label 3 para "outros"
@@ -32,6 +32,15 @@ labels_others = np.full(shape=images_others.shape[0], fill_value=3).reshape(-1, 
 # Combinando as imagens e rótulos
 train_images_final = np.vstack([images_individual, images_others])
 train_labels_final = np.vstack([labels_individual, labels_others])
+
+# Máscara para a classe AUTOMOBILE
+mask_automobile = (train_labels == AUTOMOBILE)
+
+images_automobile = train_images[mask_automobile.squeeze()]
+labels_automobile = train_labels[mask_automobile.squeeze()]
+
+# print(images_automobile.shape)
+# print(labels_automobile.shape)
 
 # Embaralhando e separando 10% para validação
 p = np.random.permutation(train_images_final.shape[0])
@@ -44,9 +53,9 @@ test_labels = train_labels_final[:4000]
 train_images = train_images_final[4000:]
 train_labels = train_labels_final[4000:]
 
-print('train_labels: ', train_labels)
-
 # Salvando os datasets
+np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_images.npy'), images_automobile)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_labels.npy'), labels_automobile)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_images.npy'), train_images)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_labels)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_images.npy'), test_images)

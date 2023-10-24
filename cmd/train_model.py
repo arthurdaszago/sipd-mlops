@@ -38,11 +38,10 @@ model = Sequential([
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # Treinando o modelo
-history = model.fit(train_images, train_labels, epochs=10, validation_split=0.1)
+history = model.fit(train_images, train_labels, epochs=20, validation_split=0.1)
 
 # Plotando a acurácia de treino e validação ao longo das épocas
 plt.figure(figsize=(12, 5))
-plt.subplot(1, 2, 1)
 plt.plot(history.history['accuracy'], label='Train Accuracy')
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.legend()
@@ -50,18 +49,19 @@ plt.title('Accuracy over epochs')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 
+plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'accuracy_graph.png'))
+
 # Plotando a perda de treino e validação ao longo das épocas
-plt.subplot(1, 2, 2)
+plt.figure(figsize=(12, 5))
 plt.plot(history.history['loss'], label='Train Loss')
 plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.legend()
 plt.title('Loss over epochs')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
-plt.tight_layout()
 
 # save fig
-plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'accuracy_loss_graph.png'))
+plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'loss_graph.png'))
 
 # Se você quiser salvar o modelo após o treinamento, você pode fazer isso:
 model.save(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
