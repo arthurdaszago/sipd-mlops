@@ -4,3 +4,10 @@ __pycache__
 model_files/dataset
 model_files/cnn_model
 model_files/cnn_stats
+
+mlops/
+mlruns/
+
+datasets/test/*
+datasets/train/*
+datasets/experiments/*
