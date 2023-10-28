@@ -25,14 +25,15 @@ def workflow():
         mlflow.set_tag("mlflow.runName", "pipeline")
 
         # dataset pipeline
-        _run("prepare_train_dataset")
-        _run("prepare_test_dataset")
+        _run("prepare_train_and_test_dataset")
         _run("prepare_experiments_dataset")
 
         # model pipeline
-        _run("train")
-        _run("test")
+        _run("train_model")
+        _run("test_model")
 
+        # experiments
+        _run("experiments")
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")

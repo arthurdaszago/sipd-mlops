@@ -34,6 +34,8 @@ model = Sequential([
     Dense(5, activation='softmax')  # 5 classes no total (avião, caminhão, navio, outros, sapo)
 ])
 
+model.summary() 
+
 # Compilando o modelo
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 

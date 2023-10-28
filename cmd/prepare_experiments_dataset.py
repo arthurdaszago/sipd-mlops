@@ -53,6 +53,15 @@ for percentage in percentages:
     final_images = np.vstack(images_list)
     final_labels = np.vstack(labels_list)
 
+        # Contando e exibindo o número de amostras para cada classe
+    unique_labels, counts = np.unique(final_labels, return_counts=True)
+    for ulabel, count in zip(unique_labels, counts):
+        class_name = [
+            'AVIÃO', 'AUTOMOBILE', 'PÁSSARO', 'GATO', 'VEADO',
+            'CACHORRO', 'SAPO', 'CAVALO', 'NAVIO', 'CAMINHÃO', 'OUTROS'
+        ][ulabel] if ulabel != 3 else "OUTROS"
+        print(f"For {int(percentage*100)}% frogs: Number of samples for {class_name}: {count}")
+
     np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'test_data_{int(percentage*100)}_frog.npy'), final_images)
     np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'test_label_{int(percentage*100)}_frog.npy'), final_labels)
 
