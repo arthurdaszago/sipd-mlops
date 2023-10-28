@@ -1,9 +1,13 @@
-import logging
 import traceback
 import warnings
-
+import logging
 import mlflow
 import click
+
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def _run(entrypoint, parameters=dict(), source_version = None, use_cache = True):

@@ -20,14 +20,7 @@ def load_dataset():
     (train_images, train_labels) = load_train_dataset()
     (test_images, test_labels) = load_test_dataset()
 
-    np.save('./train-images.npy', train_images)
-    np.save('./train-labels.npy', train_labels)
-
-    np.save('./test-images.npy', test_images)
-    np.save('./test-labels.npy', test_labels)
-
     return (train_images, train_labels), (test_images, test_labels) 
-
 
 def load_train_dataset():
     train_dataset_path = os.path.join(DATASET_PATH, 'train')
@@ -38,9 +31,6 @@ def load_train_dataset():
     labels = []
 
     for train_folder in train_folders:
-        if train_folder not in ['covid', 'normal', 'pneumonia']:
-            continue
-
         cur_path = os.path.join(train_dataset_path, train_folder)
 
         for file in os.listdir(cur_path):
@@ -58,6 +48,8 @@ def load_train_dataset():
                     labels.append(1)
                 case 'pneumonia':
                     labels.append(2)
+                case 'other_findings':
+                    labels.append(3)
 
     return np.asarray(images), np.asarray(labels)
 
@@ -71,9 +63,6 @@ def load_test_dataset():
     labels = []
 
     for test_folder in test_folders:
-        if test_folder not in ['covid', 'normal', 'pneumonia']:
-            continue
-
         cur_path = os.path.join(test_dataset_path, test_folder)
 
         for file in os.listdir(cur_path):
@@ -91,6 +80,8 @@ def load_test_dataset():
                     labels.append(1)
                 case 'pneumonia':
                     labels.append(2)
+                case 'other_findings':
+                    labels.append(3)
                 
     return np.asarray(images), np.asarray(labels)
 
@@ -105,5 +96,5 @@ if __name__ == '__main__':
     (train_images, train_labels) = shuffle_in_order(train_images, train_labels)
     (test_images, test_labels) = shuffle_in_order(train_images, train_labels)
 
-    print(train_images.shape, train_labels.shape)
-    print(test_images.shape, test_labels.shape)
+    print('train: ', train_images.shape, train_labels.shape)
+    print('test: ', test_images.shape, test_labels.shape)
