@@ -1,44 +1,30 @@
 import os
 import json
 import numpy as np
-import seaborn as sns
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
-# path
+# ================================================
 
-PATH_ROOT = None
-if os.getenv('PATH_ROOT') is not None:
-    PATH_ROOT = os.getenv('PATH_ROOT')
-else:
-    PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
+PATH_ROOT = os.getenv('PATH_ROOT')
+EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
+EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
 
-EXPERIMENT_STATS_PATH = None
-if os.getenv('EXPERIMENT_STATS_PATH') is not None:
-    EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
-else:
-    EXPERIMENT_STATS_PATH = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/stats/experiments'
+# ================================================
 
-EXPERIMENTS_DATASET_PATH = None
-if os.getenv('EXPERIMENTS_DATASET_PATH') is not None:
-    EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
-else:
-    EXPERIMENTS_DATASET_PATH = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/experiments'
+percents_of_unknown_samples = [5, 15, 25, 35]
 
-# experiments
-
-percents_of_unknown_samples = [5, 10, 20, 50]
+model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
 for percentage in percents_of_unknown_samples:
-    experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_data_{percentage}_frog.npy')
-    experiment_labels_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_label_{percentage}_frog.npy')
+    experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_data_{percentage}_other_findings.npy')
+    experiment_labels_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_label_{percentage}_other_findings.npy')
 
     experiment_images = np.load(experiment_images_path)
     experiment_labels = np.load(experiment_labels_path)
-
-    model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
     # Testando o modelo
     predictions = model.predict(experiment_images)
@@ -54,7 +40,7 @@ for percentage in percents_of_unknown_samples:
     tpr_list = []
     tnr_list = []
 
-    for i in range(conf_matrix.shape[0]):
+    for i in range(3):
         tp = conf_matrix[i, i]
         fn = np.sum(conf_matrix[i, :]) - tp
         fp = np.sum(conf_matrix[:, i]) - tp

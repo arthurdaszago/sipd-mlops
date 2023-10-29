@@ -1,245 +1,83 @@
-import numpy as np
-import tensorflow as tf
 import os
+import sys
+import numpy as np
 
-PATH_ROOT = None
-if os.getenv('PATH_ROOT') is not None:
-    PATH_ROOT = os.getenv('PATH_ROOT')
-else:
-    PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
+# ================================================
 
-# Carregar o dataset CIFAR-10
-(train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
+PATH_ROOT = os.getenv('PATH_ROOT')
+sys.path.append(PATH_ROOT)
 
-# Definindo os índices das classes no CIFAR-10
-AVIÃO, AUTOMOBILE, PÁSSARO, GATO, VEADO, CACHORRO, SAPO, CAVALO, NAVIO, CAMINHÃO = range(10)
+from src.utils.load_dataset import load_dataset, shuffle_in_order
+
+# ================================================
+
+# Carregar o dataset 
+(train_images, train_labels), (test_images, test_labels) = load_dataset()
+
+# Definindo os índices das classes no dataset
+COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
 
 # Classes de interesse
-individual_classes = [AVIÃO, CAMINHÃO, NAVIO]
-other_classes = [PÁSSARO, GATO, VEADO, CACHORRO, CAVALO]
-excluded_class = [AUTOMOBILE]
+unknown_class = [OTHER_FINDINGS]
+known_classes = [COVID, NORMAL, PNEUMONIA]
 
 # Preparando as imagens e rótulos
-mask_individual = np.isin(train_labels, individual_classes)
-mask_others = np.isin(train_labels, other_classes)
+mask_known = np.isin(train_labels, known_classes)
+mask_unknown = np.isin(train_labels, unknown_class)
 
-images_individual = train_images[mask_individual.squeeze()]
-labels_individual = np.array([individual_classes.index(label[0]) for label in train_labels[mask_individual.squeeze()]]).reshape(-1, 1)  # Convertendo rótulos para o novo sistema
+known_images = train_images[mask_known.squeeze()]
+known_labels = train_labels[mask_known.squeeze()]
 
-images_others = train_images[mask_others.squeeze()]
-labels_others = np.full(shape=images_others.shape[0], fill_value=3).reshape(-1, 1)  # Label 3 para "outros"
+print('known_images shape: ', known_images.shape)
+print('known_labels shape: ', known_labels.shape)
 
-# Combinando as imagens e rótulos
-train_images_final = np.vstack([images_individual, images_others])
-train_labels_final = np.vstack([labels_individual, labels_others])
+unknown_images = train_images[mask_unknown.squeeze()]
+unknown_labels = train_labels[mask_unknown.squeeze()]
 
-# Máscara para a classe AUTOMOBILE
-mask_automobile = (train_labels == AUTOMOBILE)
+print('unknown_images shape: ', unknown_images.shape)
+print('unknown_labels shape: ', unknown_labels.shape)
 
-images_automobile = train_images[mask_automobile.squeeze()]
-labels_automobile = train_labels[mask_automobile.squeeze()]
+mask_covid = np.isin(train_labels, [COVID])
+mask_normal = np.isin(train_labels, [NORMAL])
+mask_pneumonia = np.isin(train_labels, [PNEUMONIA])
 
-# print(images_automobile.shape)
-# print(labels_automobile.shape)
+covid_images = train_images[mask_covid.squeeze()]
+normal_images = train_images[mask_normal.squeeze()]
+pneumonia_images = train_images[mask_pneumonia.squeeze()]
 
-# Embaralhando e separando 10% para validação
-p = np.random.permutation(train_images_final.shape[0])
-train_images_final = train_images_final[p]
-train_labels_final = train_labels_final[p]
+covid_labels = train_labels[mask_covid.squeeze()]
+normal_labels = train_labels[mask_normal.squeeze()]
+pneumonia_labels = train_labels[mask_pneumonia.squeeze()]
 
-test_images = train_images_final[:4000]
-test_labels = train_labels_final[:4000]
+# Separando 1500 para validação
+validation_images = np.vstack([ covid_images[:500], normal_images[:500], pneumonia_images[:500]])
+validation_labels = np.hstack([ covid_labels[:500], normal_labels[:500], pneumonia_labels[:500]])
 
-train_images = train_images_final[4000:]
-train_labels = train_labels_final[4000:]
+(validation_images, validation_labels) = shuffle_in_order(validation_images, validation_labels)
 
-# Verificar o número de amostras por classe
-num_samples_per_class = []
+# validation_images = known_images[:1500]
+# validation_labels = known_labels[:1500]
 
-for class_index in range(10):
-    num_samples = np.sum(train_labels == class_index)
-    num_samples_per_class.append(num_samples)
-    class_name = [
-        'AVIÃO', 'AUTOMOBILE', 'PÁSSARO', 'GATO', 'VEADO',
-        'CACHORRO', 'SAPO', 'CAVALO', 'NAVIO', 'CAMINHÃO'
-    ][class_index] 
-    print(f"Number of samples for {class_name}: {num_samples}")
+print('validation_images shape: ', validation_images.shape)
+print('validation_labels shape: ', validation_labels.shape)
+
+train_images = np.vstack([ covid_images[500:], normal_images[500:], pneumonia_images[500:]])
+train_labels = np.hstack([ covid_labels[500:], normal_labels[500:], pneumonia_labels[500:]])
+
+(train_images, train_labels) = shuffle_in_order(train_images, train_labels)
+
+# train_images = known_images[1500:]
+# train_labels = known_labels[1500:]
+
+print('train_images shape: ', train_images.shape)
+print('train_labels shape: ', train_labels.shape)
 
 # Salvando os datasets
-np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_images.npy'), images_automobile)
-np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_labels.npy'), labels_automobile)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_images.npy'), train_images)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_labels)
-np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_images.npy'), test_images)
-np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_labels.npy'), test_labels)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_images.npy'), unknown_images)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_labels.npy'), unknown_labels)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'validation_images.npy'), validation_images)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'validation_labels.npy'), validation_labels)
 
 print("Datasets de treino e validação preparados.")
-
-# ========================================
-# ========================================
-# ========================================
-# ========================================
-
-# import numpy as np
-# import tensorflow as tf
-# import os
-
-# PATH_ROOT = None
-# if os.getenv('PATH_ROOT') is not None:
-#     PATH_ROOT = os.getenv('PATH_ROOT')
-# else:
-#     PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
-
-# # Carregar o dataset CIFAR-10
-# (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
-
-# # Definindo os índices das classes no CIFAR-10
-# AVIÃO, AUTOMOBILE, PÁSSARO, GATO, VEADO, CACHORRO, SAPO, CAVALO, NAVIO, CAMINHÃO = range(10)
-
-# # Classes de interesse
-# individual_classes = [AVIÃO, CAMINHÃO, NAVIO]
-# other_classes = [PÁSSARO, GATO, VEADO, CACHORRO, CAVALO]
-# excluded_class = [AUTOMOBILE]
-
-# # Determinando o número mínimo de amostras
-# min_samples = min([np.sum(train_labels == cls) for cls in individual_classes])
-# min_samples_other = min_samples // len(other_classes)
-
-# images_list = []
-# labels_list = []
-
-# # Coletando amostras das classes individuais
-# for label in individual_classes:
-#     mask = (train_labels == label).squeeze()
-#     samples = train_images[mask][:min_samples]
-#     images_list.append(samples)
-#     labels_list.append(np.full((min_samples, 1), individual_classes.index(label)))
-
-# # Coletando amostras da classe "outros"
-# for label in other_classes:
-#     mask = (train_labels == label).squeeze()
-#     samples = train_images[mask][:min_samples_other]
-#     images_list.append(samples)
-#     labels_list.append(np.full((min_samples_other, 1), 3))  # Label 3 para "outros"
-
-# # Combinando as imagens e rótulos
-# train_images_final = np.vstack(images_list)
-# train_labels_final = np.vstack(labels_list)
-
-# # Máscara para a classe AUTOMOBILE
-# mask_automobile = (train_labels == AUTOMOBILE).squeeze()
-
-# images_automobile = train_images[mask_automobile][:min_samples]
-# labels_automobile = train_labels[mask_automobile][:min_samples]
-
-# # Embaralhando e separando 10% para validação
-# p = np.random.permutation(train_images_final.shape[0])
-# train_images_final = train_images_final[p]
-# train_labels_final = train_labels_final[p]
-
-# test_images = train_images_final[:4000]
-# test_labels = train_labels_final[:4000]
-
-# train_images = train_images_final[4000:]
-# train_labels = train_labels_final[4000:]
-
-# # # Verificar o número de amostras por classe
-# num_samples_per_class = []
-
-# for class_index in range(10):
-#     num_samples = np.sum(train_labels == class_index)
-#     num_samples_per_class.append(num_samples)
-#     class_name = [
-#         'AVIÃO', 'AUTOMOBILE', 'PÁSSARO', 'GATO', 'VEADO',
-#         'CACHORRO', 'SAPO', 'CAVALO', 'NAVIO', 'CAMINHÃO'
-#     ][class_index] 
-#     print(f"Number of samples for {class_name}: {num_samples}")
-
-# # Salvando os datasets
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_images.npy'), images_automobile)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_labels.npy'), labels_automobile)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_images.npy'), train_images)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_labels)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_images.npy'), test_images)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_labels.npy'), test_labels)
-
-# print("Datasets de treino e validação balanceados preparados.")
-
-# =========================
-# =========================
-# =========================
-# =========================
-
-# import numpy as np
-# import tensorflow as tf
-# import os
-
-# PATH_ROOT = None
-# if os.getenv('PATH_ROOT') is not None:
-#     PATH_ROOT = os.getenv('PATH_ROOT')
-# else:
-#     PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
-
-# # Carregar o dataset CIFAR-10
-# (train_images, train_labels), _ = tf.keras.datasets.cifar10.load_data()
-
-# # Definindo os índices das classes no CIFAR-10
-# AVIÃO, AUTOMOBILE, PÁSSARO, GATO, VEADO, CACHORRO, SAPO, CAVALO, NAVIO, CAMINHÃO = range(10)
-
-# # Classes de interesse
-# individual_classes = [AVIÃO, CAMINHÃO, NAVIO]
-# other_classes = [PÁSSARO, GATO, VEADO, CACHORRO, CAVALO]
-# excluded_class = [AUTOMOBILE]
-
-# # Função para equilibrar amostras
-# def balance_samples(images, labels, num_samples):
-#     indices = np.random.choice(images.shape[0], num_samples, replace=False)
-#     return images[indices], labels[indices]
-
-# # Preparando as imagens e rótulos
-# mask_individual = np.isin(train_labels, individual_classes)
-# images_individual = train_images[mask_individual.squeeze()]
-# labels_individual = np.array([individual_classes.index(label[0]) for label in train_labels[mask_individual.squeeze()]]).reshape(-1, 1)
-
-# mask_others = np.isin(train_labels, other_classes)
-# images_others = train_images[mask_others.squeeze()]
-# labels_others = np.full(shape=images_others.shape[0], fill_value=3).reshape(-1, 1)  # Label 3 para "outros"
-
-# # Balanceando as amostras
-# images_individual, labels_individual = balance_samples(images_individual, labels_individual, 5000)
-# images_others, labels_others = balance_samples(images_others, labels_others, 5000)
-
-# # Combinando as imagens e rótulos
-# train_images_final = np.vstack([images_individual, images_others])
-# train_labels_final = np.vstack([labels_individual, labels_others])
-
-# # Máscara para a classe AUTOMOBILE
-# mask_automobile = (train_labels == AUTOMOBILE)
-
-# images_automobile = train_images[mask_automobile][:min_samples]
-# labels_automobile = train_labels[mask_automobile][:min_samples]
-
-# images_automobile = train_images[mask_automobile.squeeze()]
-# labels_automobile, _ = balance_samples(labels_automobile, labels_automobile, 5000)
-
-# # Embaralhando e separando 10% para validação
-# p = np.random.permutation(train_images_final.shape[0])
-# train_images_final = train_images_final[p]
-# train_labels_final = train_labels_final[p]
-
-# test_images = train_images_final[:4000]
-# test_labels = train_labels_final[:4000]
-
-# train_images = train_images_final[4000:]
-# train_labels = train_labels_final[4000:]
-
-# # Salvando os datasets
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_images.npy'), images_automobile)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_automobile_labels.npy'), labels_automobile)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_images.npy'), train_images)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_labels)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_images.npy'), test_images)
-# np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_labels.npy'), test_labels)
-
-# print("Datasets de treino e validação preparados.")
-

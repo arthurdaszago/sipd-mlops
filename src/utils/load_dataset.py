@@ -3,24 +3,53 @@ import numpy as np
 
 from PIL import Image
 
-PATH_ROOT = None
-if os.getenv('PATH_ROOT') is not None:
-    PATH_ROOT = os.getenv('PATH_ROOT')
-else:
-    PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
-
-DATASET_PATH = None
-if os.getenv('DATASET_PATH') is not None:
-    DATASET_PATH = os.getenv('DATASET_PATH')
-else:
-    DATASET_PATH = '/home/arthur/Documents/dataset'
-
+PATH_ROOT = os.getenv('PATH_ROOT')
+DATASET_PATH = os.getenv('DATASET_PATH')
+TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
+TRAIN_DATASET_PATH = os.getenv('TRAIN_DATASET_PATH')
 
 def load_dataset():
-    (train_images, train_labels) = load_train_dataset()
-    (test_images, test_labels) = load_test_dataset()
+    if already_exists():
+        (train_images, train_labels), (test_images, test_labels) = load_all_dataset()
+    else:
+        (test_images, test_labels) = load_test_dataset()
+        (train_images, train_labels) = load_train_dataset()
+        save_dataset((train_images, train_labels), (test_images, test_labels))
 
     return (train_images, train_labels), (test_images, test_labels) 
+
+def load_all_dataset():
+    # load default train dataset
+     train_images = np.load(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_images.npy'))
+     train_labels = np.load(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_labels.npy'))
+    # load default test dataset
+     test_images = np.load(os.path.join(TEST_DATASET_PATH, 'original', 'test_images.npy'))
+     test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'original', 'test_labels.npy'))
+
+     return (train_images, train_labels), (test_images, test_labels)
+
+def save_dataset(train, test):
+    (test_images, test_labels) = test
+    (train_images, train_labels) = train
+
+    # save default train dataset
+    np.save(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_images.npy'), train_images)
+    np.save(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_labels.npy'), train_labels)
+    # save default test dataset
+    np.save(os.path.join(TEST_DATASET_PATH, 'original', 'test_images.npy'), test_images)
+    np.save(os.path.join(TEST_DATASET_PATH, 'original', 'test_labels.npy'), test_labels)
+
+def already_exists():
+    train_images_exists = os.path.exists(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_images.npy'))
+    train_labels_exists = os.path.exists(os.path.join(TRAIN_DATASET_PATH, 'original', 'train_labels.npy'))
+    test_images_exists = os.path.exists(os.path.join(TEST_DATASET_PATH, 'original', 'test_images.npy'))
+    test_labels_exists = os.path.exists(os.path.join(TEST_DATASET_PATH, 'original', 'test_labels.npy'))
+
+    if train_images_exists and train_labels_exists and test_images_exists and test_labels_exists:
+        return True
+
+    return False
+
 
 def load_train_dataset():
     train_dataset_path = os.path.join(DATASET_PATH, 'train')
@@ -86,6 +115,9 @@ def load_test_dataset():
     return np.asarray(images), np.asarray(labels)
 
 def shuffle_in_order(images, labels):
+    print('len(images): ', images.shape)
+    print('len(labels): ', labels.shape)
+
     assert len(images) == len(labels)  # ensure arrays are of the same length
     p = np.random.permutation(len(images))
     return images[p], labels[p]

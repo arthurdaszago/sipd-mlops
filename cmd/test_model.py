@@ -1,33 +1,23 @@
+
 import os
 import json
 import numpy as np
 import tensorflow as tf
 
-import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
+# ================================================
 
-PATH_ROOT = None
-if os.getenv('PATH_ROOT') is not None:
-    PATH_ROOT = os.getenv('PATH_ROOT')
-else:
-    PATH_ROOT = '/home/arthur/Documents/ifc/tc/code/sipd-mlops'
+PATH_ROOT = os.getenv('PATH_ROOT')
+TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
+TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
 
-TEST_DATASET_PATH = None
-if os.getenv('TEST_DATASET_PATH') is not None:
-    TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
-else:
-    TEST_DATASET_PATH = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/test'
+# ================================================
 
-TEST_STATS_PATH = None
-if os.getenv('TEST_STATS_PATH') is not None:
-    TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
-else:
-    TEST_STATS_PATH = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/stats/test'
-
-test_images = np.load(os.path.join(TEST_DATASET_PATH, 'test_images.npy'))
-test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'test_labels.npy'))
+test_images = np.load(os.path.join(TEST_DATASET_PATH, 'validation_images.npy'))
+test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'validation_labels.npy'))
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 

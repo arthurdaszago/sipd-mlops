@@ -3,12 +3,16 @@ import warnings
 import logging
 import mlflow
 import click
+import os
 
+PATH_ROOT = os.environ['PATH_ROOT'] = "/home/arthur/Documents/ifc/tc/code/sipd-mlops"
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
+os.environ['TEST_STATS_PATH'] = f"{PATH_ROOT}/stats/test"
+os.environ['TEST_DATASET_PATH'] = f"{PATH_ROOT}/datasets/test"
+os.environ['TRAIN_DATASET_PATH'] = f"{PATH_ROOT}/datasets/train"
+os.environ['DATASET_PATH'] = "/home/arthur/Documents/dataset"
+os.environ['EXPERIMENT_STATS_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/experiments'
+os.environ['EXPERIMENTS_DATASET_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/experiments'
 
 def _run(entrypoint, parameters=dict(), source_version = None, use_cache = True):
     """Launching new run for an entrypoint"""
