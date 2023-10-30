@@ -21,7 +21,7 @@ unknown_class = [OTHER_FINDINGS]
 known_classes = [COVID, NORMAL, PNEUMONIA]
 
 # percent of unknown samples to add in experiment
-percentages = [0.05, 0.15, 0.25, 0.35]
+percentages = [0.05, 0.1, 0.2, 0.3]
 
 # num of total samples
 total_samples = 1500
@@ -51,9 +51,14 @@ for percentage in percentages:
     images_list.append(other_finding_images_samples[:num_unknown_samples])
     labels_list.append(np.full((num_unknown_samples, 1), OTHER_FINDINGS))
 
+    print('other_finding_images_samples[:num_unknown_samples]: ', other_finding_images_samples[:num_unknown_samples].shape)
+
     # Salvando
     final_images = np.vstack([images_list[0], images_list[1], images_list[2], images_list[3]])
     final_labels = np.vstack([labels_list[0], labels_list[1], labels_list[2], labels_list[3]])
+
+    print('final_images: ', final_images.shape)    
+    print('final_labels: ', final_labels.shape)    
 
     # Contando e exibindo o número de amostras para cada classe
     unique_labels, counts = np.unique(final_labels, return_counts=True)

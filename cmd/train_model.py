@@ -44,7 +44,7 @@ else:
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
     # Treinando o modelo
-    history = model.fit(train_images, train_labels, epochs=5, validation_split=0.1)
+    history = model.fit(train_images, train_labels, epochs=25, validation_split=0.1)
 
     # Plotando a acurácia de treino e validação ao longo das épocas
     plt.figure(figsize=(12, 5))

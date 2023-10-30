@@ -19,7 +19,7 @@ TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
 test_images = np.load(os.path.join(TEST_DATASET_PATH, 'validation_images.npy'))
 test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'validation_labels.npy'))
 
-model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
+model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
 # Testando o modelo
 predictions = model.predict(test_images)
@@ -56,7 +56,7 @@ stats = {
 }
 
 # Escrevendo no arquivo JSON
-with open(os.path.join(TEST_STATS_PATH, 'matrix_confusion.json'), 'w') as f:
+with open(os.path.join(TEST_STATS_PATH, 'retest_stats.json'), 'w') as f:
     json.dump(stats, f)
 
 # Plotando a matriz de confusão
@@ -65,4 +65,4 @@ sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
 plt.title('Confusion Matrix')
-plt.savefig(os.path.join(TEST_STATS_PATH, 'confusion_matrix.png'))
+plt.savefig(os.path.join(TEST_STATS_PATH, 'retest_confusion_matrix.png'))

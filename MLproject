@@ -4,19 +4,32 @@ python_env: python_env.yaml
 
 entry_points:
   prepare_train_and_test_dataset:
-    command: "python cmd/prepare_train_and_test_dataset.py"
+    command: "python3 cmd/prepare_train_and_test_dataset.py"
 
   prepare_experiments_dataset:
-    command: "python cmd/prepare_experiments_dataset.py"
+    command: "python3 cmd/prepare_experiments_dataset.py"
 
   train_model:
-    command: "python cmd/train_model.py"
+    command: "python3 cmd/train_model.py"
 
   test_model:
-    command: "python cmd/test_model.py"
+    command: "python3 cmd/test_model.py"
 
   experiments:
-    command: "python cmd/experiments.py"
+    command: "python3 cmd/experiments.py"
+
+  retrain_model:
+    parameters:
+      num_train_samples: { type: int, default: 75 }
+    command: "python3 cmd/train_remake_model.py"
+
+  retest_model_retrained:
+    parameters:
+      num_train_samples: { type: int, default: 75 }
+    command: "python3 cmd/test_model_retrained.py"
+
+  remake_experiments:
+    command: "python3 cmd/experiments_remake.py"
 
   main:
-    command: "python cmd/main.py"
+    command: "python3 cmd/main.py"

@@ -1701,3 +1701,218 @@ __main__ - ERROR - 2023-10-29 19:42:51,631 - Traceback (most recent call last):
     raise ExecutionException(f"Run (ID '{run_id}') failed")
 mlflow.exceptions.ExecutionException: Run (ID 'a0eb87704c8942178fe0654e5ccd0bc7') failed
 
+__main__ - ERROR - 2023-10-29 21:40:29,647 - Failed to run workflow due to error:
+Run (ID '86c4d93725f846aea53efc0cd21199de') failed
+__main__ - ERROR - 2023-10-29 21:40:29,651 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 41, in workflow
+    _run("test_model")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID '86c4d93725f846aea53efc0cd21199de') failed
+
+__main__ - ERROR - 2023-10-30 00:34:13,745 - Failed to run workflow due to error:
+Non-zero exit code: 1
+Command: ['/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/bin/python', '-m', 'virtualenv', '--python', '/home/arthur/.pyenv/versions/3.10.13/bin/python', '/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b']
+__main__ - ERROR - 2023-10-30 00:34:13,755 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 41, in workflow
+    _run("test_model")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 337, in run
+    submitted_run_obj = _run(
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 106, in _run
+    submitted_run = backend.run(
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/projects/backend/local.py", line 164, in run
+    activate_cmd = _create_virtualenv(
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/utils/virtualenv.py", line 250, in _create_virtualenv
+    _exec_cmd(
+  File "/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/lib/python3.10/site-packages/mlflow/utils/process.py", line 117, in _exec_cmd
+    raise ShellCommandException.from_completed_process(comp_process)
+mlflow.utils.process.ShellCommandException: Non-zero exit code: 1
+Command: ['/home/arthur/.mlflow/envs/mlflow-ee2151125638920885a7c5b8ea4d8ebbb2e906cb/bin/python', '-m', 'virtualenv', '--python', '/home/arthur/.pyenv/versions/3.10.13/bin/python', '/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b']
+
+__main__ - ERROR - 2023-10-30 01:02:44,414 - Failed to run workflow due to error:
+Run (ID '476142d6786d47f897b2351fb1f892f0') failed
+__main__ - ERROR - 2023-10-30 01:02:44,418 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID '476142d6786d47f897b2351fb1f892f0') failed
+
+__main__ - ERROR - 2023-10-30 01:11:51,696 - Failed to run workflow due to error:
+Run (ID 'f81d49c3158d4b6bad3023025abc5c6f') failed
+__main__ - ERROR - 2023-10-30 01:11:51,700 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID 'f81d49c3158d4b6bad3023025abc5c6f') failed
+
+__main__ - ERROR - 2023-10-30 01:13:42,270 - Failed to run workflow due to error:
+Run (ID 'e13b4088b0644f34a0a1374f2c0857dd') failed
+__main__ - ERROR - 2023-10-30 01:13:42,274 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID 'e13b4088b0644f34a0a1374f2c0857dd') failed
+
+__main__ - ERROR - 2023-10-30 01:15:20,244 - Failed to run workflow due to error:
+Run (ID 'cac30de04e664bb493f99a3fa67b61b0') failed
+__main__ - ERROR - 2023-10-30 01:15:20,248 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID 'cac30de04e664bb493f99a3fa67b61b0') failed
+
+__main__ - ERROR - 2023-10-30 01:25:36,701 - Failed to run workflow due to error:
+Run (ID 'cdc850531f4a4810860fdf2311e513a6') failed
+__main__ - ERROR - 2023-10-30 01:25:36,705 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID 'cdc850531f4a4810860fdf2311e513a6') failed
+
+__main__ - ERROR - 2023-10-30 02:09:33,912 - Failed to run workflow due to error:
+Run (ID '112c143a2e42479383cbdd07718bc142') failed
+__main__ - ERROR - 2023-10-30 02:09:33,916 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID '112c143a2e42479383cbdd07718bc142') failed
+
+__main__ - ERROR - 2023-10-30 02:12:49,083 - Failed to run workflow due to error:
+Run (ID 'df589719069c4cbbb6308b857fd75753') failed
+__main__ - ERROR - 2023-10-30 02:12:49,087 - Traceback (most recent call last):
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 57, in <module>
+    workflow()
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 44, in workflow
+    _run("experiments")
+  File "/home/arthur/Documents/ifc/tc/code/sipd-mlops/cmd/main.py", line 24, in _run
+    submitted_run = mlflow.run(".", entrypoint)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 354, in run
+    _wait_for(submitted_run_obj)
+  File "/home/arthur/.mlflow/envs/mlflow-a47bc148921c267c801d4fc702eac9177735bf6b/lib/python3.10/site-packages/mlflow/projects/__init__.py", line 371, in _wait_for
+    raise ExecutionException(f"Run (ID '{run_id}') failed")
+mlflow.exceptions.ExecutionException: Run (ID 'df589719069c4cbbb6308b857fd75753') failed
+
