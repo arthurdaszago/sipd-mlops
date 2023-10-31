@@ -42,28 +42,28 @@ for percentage in percents_of_unknown_samples:
     # Calculando acurácia
     accuracy = np.trace(conf_matrix) / float(np.sum(conf_matrix))
 
+    # Micro-average calculation
+    tp_total = np.sum(np.diag(conf_matrix))  # Sum of diagonal elements gives total true positives
+    fp_total = np.sum(np.sum(conf_matrix, axis=0) - np.diag(conf_matrix))  # Sum of columns minus diagonal
+    fn_total = np.sum(np.sum(conf_matrix, axis=1) - np.diag(conf_matrix))  # Sum of rows minus diagonal
+    tn_total = np.sum(conf_matrix) - (tp_total + fp_total + fn_total)
+
     # Para multiclasse, vamos calcular TPR e TNR para cada classe e armazená-los em listas
-    tpr_list = []
-    tnr_list = []
-
-    for i in range(3):
-        tp = conf_matrix[i, i]
-        fn = np.sum(conf_matrix[i, :]) - tp
-        fp = np.sum(conf_matrix[:, i]) - tp
-        tn = np.sum(conf_matrix) - (tp + fp + fn)
-
-        tpr = tp / (tp + fn)
-        tnr = tn / (tn + fp)
-
-        tpr_list.append(tpr)
-        tnr_list.append(tnr)
+    tpr_micro = tp_total / (tp_total + fn_total)
+    tnr_micro = tn_total / (tn_total + fp_total)
 
     # Escrevendo no arquivo JSON
     stats = {
-        'confusion_matrix': conf_matrix.tolist(),
+        'TPR': int(tpr_micro),
+        'TNR': int(tnr_micro),
         'accuracy': accuracy,
-        'TPR': tpr_list,
-        'TNR': tnr_list
+        'confusion_matrix': {
+            'tp': int(tp_total),
+            'fp': int(fp_total),
+            'fn': int(fn_total),
+            'tn': int(tn_total),
+            'list': conf_matrix.tolist(),
+        },
     }
 
     # Escrevendo no arquivo JSON

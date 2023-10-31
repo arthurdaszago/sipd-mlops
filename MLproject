@@ -31,5 +31,13 @@ entry_points:
   remake_experiments:
     command: "python3 cmd/experiments_remake.py"
 
+  test1:
+    parameters:
+      num: { type: int, default: 1 }
+    command: "python3 cmd/test1.py {num}"
+
+  test2:
+    command: "python3 cmd/test2.py"
+
   main:
     command: "python3 cmd/main.py"

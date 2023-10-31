@@ -16,8 +16,8 @@ TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
 
 # ================================================
 
-test_images = np.load(os.path.join(TEST_DATASET_PATH, 'validation_images.npy'))
-test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'validation_labels.npy'))
+test_images = np.load(os.path.join(TEST_DATASET_PATH, 'test_images.npy'))
+test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'test_labels.npy'))
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
@@ -28,31 +28,38 @@ predicted_labels = np.argmax(predictions, axis=1)
 # Calculando a matriz de confusão
 conf_matrix = confusion_matrix(test_labels, predicted_labels)
 
+print('conf_matrix: ', conf_matrix)
+
 # Calculando acurácia
 accuracy = np.trace(conf_matrix) / float(np.sum(conf_matrix))
 
+# Micro-average calculation
+tp_total = np.sum(np.diag(conf_matrix))  # Sum of diagonal elements gives total true positives
+fp_total = np.sum(np.sum(conf_matrix, axis=0) - np.diag(conf_matrix))  # Sum of columns minus diagonal
+fn_total = np.sum(np.sum(conf_matrix, axis=1) - np.diag(conf_matrix))  # Sum of rows minus diagonal
+tn_total = np.sum(conf_matrix) - (tp_total + fp_total + fn_total)
+
+print('tp_total: ', tp_total)
+print('fp_total: ', fp_total)
+print('fn_total: ', fn_total)
+print('tn_total: ', tn_total)
+
 # Para multiclasse, vamos calcular TPR e TNR para cada classe e armazená-los em listas
-tpr_list = []
-tnr_list = []
-
-for i in range(conf_matrix.shape[0]):
-    tp = conf_matrix[i, i]
-    fn = np.sum(conf_matrix[i, :]) - tp
-    fp = np.sum(conf_matrix[:, i]) - tp
-    tn = np.sum(conf_matrix) - (tp + fp + fn)
-
-    tpr = tp / (tp + fn)
-    tnr = tn / (tn + fp)
-
-    tpr_list.append(tpr)
-    tnr_list.append(tnr)
+tpr_micro = tp_total / (tp_total + fn_total)
+tnr_micro = tn_total / (tn_total + fp_total)
 
 # Escrevendo no arquivo JSON
 stats = {
-    'confusion_matrix': conf_matrix.tolist(),
+    'TPR': tpr_micro,
+    'TNR': tnr_micro,
     'accuracy': accuracy,
-    'TPR': tpr_list,
-    'TNR': tnr_list
+    'confusion_matrix': {
+        'tp': tp_total,
+        'fp': fp_total,
+        'fn': fn_total,
+        'tn': tn_total,
+        'list': conf_matrix.tolist(),
+    },
 }
 
 # Escrevendo no arquivo JSON

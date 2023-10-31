@@ -9,6 +9,9 @@ mlops/
 mlruns/
 model/*
 
-datasets/test/*
-datasets/train/*
-datasets/experiments/*
+datasets/test/*.npy
+datasets/test/original/*.npy
+datasets/train/*.npy
+datasets/train/original/*.npy
+datasets/experiments/*.npy
+datasets/experiments/original/*.npy

@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
 
+num_other_findings_train_samples = sys.argv[1]
+
 # ================================================
 
 PATH_ROOT = os.getenv('PATH_ROOT')
@@ -44,8 +46,11 @@ model.summary()
 # Compilando o modelo
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+# early stop
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
 # Treinando o modelo
-history = model.fit(other_findings_train_images, other_findings_train_labels, epochs=25, validation_split=0.1)
+history = model.fit(other_findings_train_images, other_findings_train_labels, epochs=25, validation_split=0.1, callbacks=[callback])
 
 # Plotando a acurácia de treino e validação ao longo das épocas
 plt.figure(figsize=(12, 5))
@@ -73,4 +78,4 @@ plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'retrained_loss_graph.png'
 # Se você quiser salvar o modelo após o treinamento, você pode fazer isso:
 model.save(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
-mlflow.run(uri='.', entry_point='experiments_remake', parameters={ num_train_samples:  })
+mlflow.run(uri='.', entry_point='experiments_remake', parameters={ 'num_train_samples': 1 })

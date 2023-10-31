@@ -43,8 +43,11 @@ else:
     # Compilando o modelo
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+    # early stop
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
     # Treinando o modelo
-    history = model.fit(train_images, train_labels, epochs=25, validation_split=0.1)
+    history = model.fit(train_images, train_labels, epochs=25, validation_split=0.1, callbacks=[callback])
 
     # Plotando a acurácia de treino e validação ao longo das épocas
     plt.figure(figsize=(12, 5))

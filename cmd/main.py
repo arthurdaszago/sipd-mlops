@@ -21,7 +21,7 @@ def _run(entrypoint, parameters=dict(), source_version = None, use_cache = True)
         "Launching new run for entrypoint=%s and parameters=%s"
         % (entrypoint, parameters)
     )
-    submitted_run = mlflow.run(".", entrypoint)
+    submitted_run = mlflow.run(".", entrypoint, parameters=parameters)
     return submitted_run
 
 

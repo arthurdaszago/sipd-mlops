@@ -37,47 +37,40 @@ unknown_labels = train_labels[mask_unknown.squeeze()]
 print('unknown_images shape: ', unknown_images.shape)
 print('unknown_labels shape: ', unknown_labels.shape)
 
-mask_covid = np.isin(train_labels, [COVID])
-mask_normal = np.isin(train_labels, [NORMAL])
-mask_pneumonia = np.isin(train_labels, [PNEUMONIA])
+mask_covid = np.isin(test_labels, [COVID])
+mask_normal = np.isin(test_labels, [NORMAL])
+mask_pneumonia = np.isin(test_labels, [PNEUMONIA])
 
-covid_images = train_images[mask_covid.squeeze()]
-normal_images = train_images[mask_normal.squeeze()]
-pneumonia_images = train_images[mask_pneumonia.squeeze()]
+covid_images = test_images[mask_covid.squeeze()]
+normal_images = test_images[mask_normal.squeeze()]
+pneumonia_images = test_images[mask_pneumonia.squeeze()]
 
-covid_labels = train_labels[mask_covid.squeeze()]
-normal_labels = train_labels[mask_normal.squeeze()]
-pneumonia_labels = train_labels[mask_pneumonia.squeeze()]
+covid_labels = test_labels[mask_covid.squeeze()]
+normal_labels = test_labels[mask_normal.squeeze()]
+pneumonia_labels = test_labels[mask_pneumonia.squeeze()]
 
 # Separando 1500 para validação
-validation_images = np.vstack([ covid_images[:500], normal_images[:500], pneumonia_images[:500]])
-validation_labels = np.hstack([ covid_labels[:500], normal_labels[:500], pneumonia_labels[:500]])
+test_images = np.vstack([ covid_images, normal_images, pneumonia_images])
+test_labels = np.hstack([ covid_labels, normal_labels, pneumonia_labels])
 
-(validation_images, validation_labels) = shuffle_in_order(validation_images, validation_labels)
+print('test_images.shape: ', test_images.shape)
+print('test_labels.shape: ', test_labels.shape)
 
-# validation_images = known_images[:1500]
-# validation_labels = known_labels[:1500]
-
-print('validation_images shape: ', validation_images.shape)
-print('validation_labels shape: ', validation_labels.shape)
-
-train_images = np.vstack([ covid_images[500:], normal_images[500:], pneumonia_images[500:]])
-train_labels = np.hstack([ covid_labels[500:], normal_labels[500:], pneumonia_labels[500:]])
-
-(train_images, train_labels) = shuffle_in_order(train_images, train_labels)
-
-# train_images = known_images[1500:]
-# train_labels = known_labels[1500:]
+train_images = np.vstack([ known_images ])
+train_labels = np.hstack([ known_labels ])
 
 print('train_images shape: ', train_images.shape)
 print('train_labels shape: ', train_labels.shape)
 
+(test_images, test_labels) = shuffle_in_order(test_images, test_labels)
+(train_images, train_labels) = shuffle_in_order(train_images, train_labels)
+
 # Salvando os datasets
+np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_images.npy'), test_images)
+np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'test_labels.npy'), test_labels)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_images.npy'), train_images)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_labels)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_images.npy'), unknown_images)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_labels.npy'), unknown_labels)
-np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'validation_images.npy'), validation_images)
-np.save(os.path.join(PATH_ROOT, 'datasets', 'test', 'validation_labels.npy'), validation_labels)
 
 print("Datasets de treino e validação preparados.")
