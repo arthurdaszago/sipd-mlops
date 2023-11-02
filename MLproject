@@ -20,24 +20,18 @@ entry_points:
 
   retrain_model:
     parameters:
-      num_train_samples: { type: int, default: 75 }
+      num_other_findings_train_samples: { type: int, default: 75 }
     command: "python3 cmd/train_remake_model.py"
 
   retest_model_retrained:
     parameters:
-      num_train_samples: { type: int, default: 75 }
+      num_other_findings_train_samples: { type: int, default: 75 }
     command: "python3 cmd/test_model_retrained.py"
 
   remake_experiments:
-    command: "python3 cmd/experiments_remake.py"
-
-  test1:
     parameters:
-      num: { type: int, default: 1 }
-    command: "python3 cmd/test1.py {num}"
-
-  test2:
-    command: "python3 cmd/test2.py"
+      num_other_findings_train_samples: { type: int, default: 75 }
+    command: "python3 cmd/experiments_remake.py"
 
   main:
     command: "python3 cmd/main.py"

@@ -78,4 +78,4 @@ plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'retrained_loss_graph.png'
 # Se você quiser salvar o modelo após o treinamento, você pode fazer isso:
 model.save(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
-mlflow.run(uri='.', entry_point='experiments_remake', parameters={ 'num_train_samples': 1 })
+mlflow.run(uri='.', entry_point='experiments_remake', parameters={ 'num_other_findings_train_samples': num_other_findings_train_samples })

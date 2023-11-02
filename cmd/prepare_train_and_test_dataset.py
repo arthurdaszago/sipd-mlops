@@ -11,6 +11,10 @@ from src.utils.load_dataset import load_dataset, shuffle_in_order
 
 # ================================================
 
+print('======================================================')
+print("Iniciando preparamento de datasets de treino e validação.")
+print('======================================================')
+
 # Carregar o dataset 
 (train_images, train_labels), (test_images, test_labels) = load_dataset()
 
@@ -73,4 +77,6 @@ np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_labels.npy'), train_
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_images.npy'), unknown_images)
 np.save(os.path.join(PATH_ROOT, 'datasets', 'train', 'train_other_findings_labels.npy'), unknown_labels)
 
+print('======================================================')
 print("Datasets de treino e validação preparados.")
+print('======================================================')

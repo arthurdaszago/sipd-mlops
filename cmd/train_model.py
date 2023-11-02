@@ -28,13 +28,13 @@ if os.path.exists(model_path):
 else:
     # Criando o modelo
     model = Sequential([
-        Conv2D(64, (3,3), activation='relu', input_shape=(224, 224, 1)),
+        Conv2D(32, (3,3), activation='relu', input_shape=(224, 224, 1)),
         MaxPooling2D((2, 2)),
-        Conv2D(32, (3,3), activation='relu'),
+        Conv2D(64, (3,3), activation='relu'),
         MaxPooling2D((2, 2)),
-        Conv2D(16, (3,3), activation='relu'),
+        Conv2D(64, (3,3), activation='relu'),
         Flatten(),
-        Dense(16, activation='relu'),
+        Dense(64, activation='relu'),
         Dense(3, activation='softmax')  # 3 classes no total (covid, normal ou pneumonia)
     ])
 
@@ -44,7 +44,7 @@ else:
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
     # early stop
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
 
     # Treinando o modelo
     history = model.fit(train_images, train_labels, epochs=25, validation_split=0.1, callbacks=[callback])

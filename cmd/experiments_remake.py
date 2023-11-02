@@ -1,5 +1,7 @@
 import os
+import sys
 import json
+import mlflow
 import numpy as np
 import seaborn as sns
 import tensorflow as tf
@@ -13,9 +15,13 @@ PATH_ROOT = os.getenv('PATH_ROOT')
 EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
 EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
 
+sys.path.append(PATH_ROOT)
+
+from src.utils.detect_concept_drift import detect_experiment_remake_concept_drift
+
 # ================================================
 
-percents_of_unknown_samples = [5, 10, 20, 30]
+percents_of_unknown_samples = [2.5, 5, 7.5, 10, 12.5, 15]
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
@@ -72,7 +78,7 @@ for percentage in percents_of_unknown_samples:
     }
 
     # Escrevendo no arquivo JSON
-    with open(os.path.join(EXPERIMENT_STATS_PATH, f'matrix_confusion_{percentage}.json'), 'w') as f:
+    with open(os.path.join(EXPERIMENT_STATS_PATH, f'retrained_stats_{percentage}.json'), 'w') as f:
         json.dump(stats, f)
 
     # Plotando a matriz de confusão
@@ -82,3 +88,9 @@ for percentage in percents_of_unknown_samples:
     plt.ylabel('True Label')
     plt.title('Confusion Matrix')
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'confusion_matrix_{percentage}.png'))
+
+    has_concept_drift = detect_experiment_remake_concept_drift(stats=stats)
+
+    if has_concept_drift:
+        parameters = { 'num_train_samples': None }
+        mlflow.run('.', 'train_remake_model', parameters=parameters)

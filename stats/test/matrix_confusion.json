@@ -1,1 +1,6 @@
-{"TPR": 0.8046666666666666, "TNR": -Infinity, "accuracy": 0.8046666666666666, "confusion_matrix": {"tp": 
+{
+  "Accuracy": 0.33333,
+  "Recall": 0.33333,
+  "Precision": 0.11111,
+  "F1-Score": 0.16667
+}

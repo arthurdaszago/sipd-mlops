@@ -1,11 +1,13 @@
 import os
+import sys
 import json
+import mlflow
 import numpy as np
 import seaborn as sns
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
 
 # ================================================
 
@@ -13,9 +15,20 @@ PATH_ROOT = os.getenv('PATH_ROOT')
 EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
 EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
 
+sys.path.append(PATH_ROOT)
+
+from src.utils.detect_concept_drift import detect_experimet_concept_drift 
+
 # ================================================
 
-percents_of_unknown_samples = [5, 10, 20, 30]
+# Definindo os índices das classes no dataset
+COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
+
+# Classes de interesse
+unknown_class = [OTHER_FINDINGS]
+known_classes = [COVID, NORMAL, PNEUMONIA]
+
+percents_of_unknown_samples = [5.0, 10.0, 15.0, 20.0]
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
@@ -37,38 +50,21 @@ for percentage in percents_of_unknown_samples:
     print('experiment_labels: ', experiment_labels.shape)
 
     # Calculando a matriz de confusão
-    conf_matrix = confusion_matrix(experiment_labels, predicted_labels)
-
-    # Calculando acurácia
-    accuracy = np.trace(conf_matrix) / float(np.sum(conf_matrix))
-
-    # Micro-average calculation
-    tp_total = np.sum(np.diag(conf_matrix))  # Sum of diagonal elements gives total true positives
-    fp_total = np.sum(np.sum(conf_matrix, axis=0) - np.diag(conf_matrix))  # Sum of columns minus diagonal
-    fn_total = np.sum(np.sum(conf_matrix, axis=1) - np.diag(conf_matrix))  # Sum of rows minus diagonal
-    tn_total = np.sum(conf_matrix) - (tp_total + fp_total + fn_total)
-
-    # Para multiclasse, vamos calcular TPR e TNR para cada classe e armazená-los em listas
-    tpr_micro = tp_total / (tp_total + fn_total)
-    tnr_micro = tn_total / (tn_total + fp_total)
+    conf_matrix = confusion_matrix(experiment_labels, predicted_labels, labels=known_classes)
 
     # Escrevendo no arquivo JSON
     stats = {
-        'TPR': int(tpr_micro),
-        'TNR': int(tnr_micro),
-        'accuracy': accuracy,
-        'confusion_matrix': {
-            'tp': int(tp_total),
-            'fp': int(fp_total),
-            'fn': int(fn_total),
-            'tn': int(tn_total),
-            'list': conf_matrix.tolist(),
-        },
+        "Accuracy": round(accuracy_score(experiment_labels, predicted_labels), 5),
+        "Recall": round(recall_score(experiment_labels, predicted_labels, average='macro'), 5),
+        "Precision": round(precision_score(experiment_labels, predicted_labels, average='macro'), 5),
+        "F1-Score": round(f1_score(experiment_labels, predicted_labels, average='macro'), 5),
     }
 
     # Escrevendo no arquivo JSON
-    with open(os.path.join(EXPERIMENT_STATS_PATH, f'matrix_confusion_{percentage}.json'), 'w') as f:
+    with open(os.path.join(EXPERIMENT_STATS_PATH, f'stats_{percentage}.json'), 'w') as f:
+        print('Salvando.......................')
         json.dump(stats, f)
+        print('Salvou.......................')
 
     # Plotando a matriz de confusão
     plt.figure(figsize=(8, 6))
@@ -77,3 +73,9 @@ for percentage in percents_of_unknown_samples:
     plt.ylabel('True Label')
     plt.title('Confusion Matrix')
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'confusion_matrix_{percentage}.png'))
+
+    has_concept_drift = detect_experimet_concept_drift(stats=stats)
+
+    if has_concept_drift:
+        parameters = { 'num_train_samples': None }
+        mlflow.run('.', 'train_remake_model', parameters=parameters)
