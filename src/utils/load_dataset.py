@@ -1,8 +1,8 @@
 import os
+import cv2
 import numpy as np
 
 from tqdm import tqdm
-from PIL import Image
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 DATASET_PATH = os.getenv('DATASET_PATH')
@@ -67,7 +67,7 @@ def load_train_dataset():
         for file in tqdm(os.listdir(cur_path), desc=f"Lendo {train_folder}"):
             file_path = os.path.join(train_dataset_path, train_folder, file)
 
-            image = Image.open(file_path)
+            image = cv2.imread(file_path)
             np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)
@@ -100,8 +100,8 @@ def load_test_dataset():
         for file in tqdm(os.listdir(cur_path), desc=f"Lendo {test_folder}"):
             file_path = os.path.join(test_dataset_path, test_folder, file)
 
-            image = Image.open(file_path)
-            np_image = np.asarray(image)
+            image = cv2.imread(file_path)
+            np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)
 

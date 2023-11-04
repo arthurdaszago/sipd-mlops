@@ -18,8 +18,6 @@ from src.utils.model import define_model
 train_images = np.load(os.path.join(TRAIN_DATASET_PATH, 'train_images.npy'))
 train_labels = np.load(os.path.join(TRAIN_DATASET_PATH, 'train_labels.npy'))
 
-train_images = train_images[..., np.newaxis]
-
 print('train_images.shape: ', train_images.shape)
 print('train_labels.shape: ', train_labels.shape)
 
@@ -36,8 +34,10 @@ else:
     # early stop
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=0.075)
 
+    print('train_images.shape: ', train_images.shape, ', train_labels.shape: ', train_labels.shape)
+
     # Treinando o modelo
-    history = model.fit(train_images, train_labels, batch_size=8, epochs=25, validation_split=0.1, callbacks=[callback])
+    history = model.fit(train_images, train_labels, batch_size=4, epochs=25, validation_split=0.1, callbacks=[callback], verbose=1)
 
     # Plotando a acurácia de treino e validação ao longo das épocas
     plt.figure(figsize=(12, 5))

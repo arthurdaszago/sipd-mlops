@@ -6,7 +6,7 @@ def define_model():
     model = models.Sequential()
 
     # Define o input shape
-    input_shape = (224, 224, 1)  # Ajuste o input_shape conforme necessário
+    input_shape = (224, 224, 3)  # Ajuste o input_shape conforme necessário
 
     # Adiciona uma camada de convolução baseada no EfficientNetB4
     model.add(tf.keras.applications.EfficientNetB4(
