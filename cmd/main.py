@@ -9,8 +9,10 @@ PATH_ROOT = os.environ['PATH_ROOT'] = "/home/arthur/Documents/ifc/tc/code/sipd-m
 
 os.environ['TEST_STATS_PATH'] = f"{PATH_ROOT}/stats/test"
 os.environ['TEST_DATASET_PATH'] = f"{PATH_ROOT}/datasets/test"
+os.environ['TEST_DATASET_PATH'] = f"{PATH_ROOT}/datasets/test"
 os.environ['TRAIN_DATASET_PATH'] = f"{PATH_ROOT}/datasets/train"
 os.environ['DATASET_PATH'] = "/home/arthur/Documents/dataset"
+os.environ['DATASET2_PATH'] = "/home/arthur/Documents/dataset2"
 os.environ['EXPERIMENT_STATS_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/stats/experiments'
 os.environ['EXPERIMENTS_DATASET_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/experiments'
 
@@ -33,14 +35,14 @@ def workflow():
         mlflow.set_tag("mlflow.runName", "pipeline")
 
         # dataset pipeline
-        _run("prepare_train_and_test_dataset")
+        # _run("prepare_train_and_test_dataset")
         _run("prepare_experiments_dataset")
 
-        # model pipeline
+        # # model pipeline
         _run("train_model")
         _run("test_model")
 
-        # experiments
+        # # experiments
         _run("experiments")
 
 if __name__ == "__main__":

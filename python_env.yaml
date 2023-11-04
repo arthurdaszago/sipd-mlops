@@ -9,5 +9,6 @@ build_dependencies:
 # Dependencies required to run the project.
 dependencies:
   - mlflow
-  - tensorflow==2.12
+  - tensorflow
   - seaborn
+  - tqdm

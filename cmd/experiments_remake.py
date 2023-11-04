@@ -7,7 +7,7 @@ import seaborn as sns
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
 
 # ================================================
 
@@ -17,13 +17,17 @@ EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
 
 sys.path.append(PATH_ROOT)
 
+num_samples = sys.argv[1]
+
 from src.utils.detect_concept_drift import detect_experiment_remake_concept_drift
 
 # ================================================
 
-percents_of_unknown_samples = [2.5, 5, 7.5, 10, 12.5, 15]
+percents_of_unknown_samples = [5.0, 10.0, 15.0, 20.0]
 
+# Carrega e compila o modelo
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 for percentage in percents_of_unknown_samples:
     experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_data_{percentage}_other_findings.npy')
@@ -45,36 +49,12 @@ for percentage in percents_of_unknown_samples:
     # Calculando a matriz de confusão
     conf_matrix = confusion_matrix(experiment_labels, predicted_labels)
 
-    # Calculando acurácia
-    accuracy = np.trace(conf_matrix) / float(np.sum(conf_matrix))
-
-    # Micro-average calculation
-    tp_total = np.sum(np.diag(conf_matrix))  # Sum of diagonal elements gives total true positives
-    fp_total = np.sum(np.sum(conf_matrix, axis=0) - np.diag(conf_matrix))  # Sum of columns minus diagonal
-    fn_total = np.sum(np.sum(conf_matrix, axis=1) - np.diag(conf_matrix))  # Sum of rows minus diagonal
-    tn_total = np.sum(conf_matrix) - (tp_total + fp_total + fn_total)
-
-    print('tp_total: ', tp_total)
-    print('fp_total: ', fp_total)
-    print('fn_total: ', fn_total)
-    print('tn_total: ', tn_total)
-
-    # Para multiclasse, vamos calcular TPR e TNR para cada classe e armazená-los em listas
-    tpr_micro = tp_total / (tp_total + fn_total)
-    tnr_micro = tn_total / (tn_total + fp_total)
-
     # Escrevendo no arquivo JSON
     stats = {
-        'TPR': int(tpr_micro),
-        'TNR': int(tnr_micro),
-        'accuracy': accuracy,
-        'confusion_matrix': {
-            'tp': int(tp_total),
-            'fp': int(fp_total),
-            'fn': int(fn_total),
-            'tn': int(tn_total),
-            'list': conf_matrix.tolist(),
-        },
+        "Accuracy": round(accuracy_score(experiment_labels, predicted_labels), 5),
+        "Recall": round(recall_score(experiment_labels, predicted_labels, average='macro'), 5),
+        "Precision": round(precision_score(experiment_labels, predicted_labels, average='macro'), 5),
+        "F1-Score": round(f1_score(experiment_labels, predicted_labels, average='macro'), 5),
     }
 
     # Escrevendo no arquivo JSON
@@ -92,5 +72,5 @@ for percentage in percents_of_unknown_samples:
     has_concept_drift = detect_experiment_remake_concept_drift(stats=stats)
 
     if has_concept_drift:
-        parameters = { 'num_train_samples': None }
-        mlflow.run('.', 'train_remake_model', parameters=parameters)
+        parameters = { 'num_samples': num_samples }
+        mlflow.run('.', entry_point='retrain_model', parameters=parameters)

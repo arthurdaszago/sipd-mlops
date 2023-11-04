@@ -1,15 +1,17 @@
 import os
+import sys
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 
 # ================================================
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 TRAIN_DATASET_PATH = os.getenv('TRAIN_DATASET_PATH')
+
+sys.path.append(PATH_ROOT)
+
+from src.utils.model import define_model
 
 # ================================================
 
@@ -27,27 +29,15 @@ if os.path.exists(model_path):
     pass
 else:
     # Criando o modelo
-    model = Sequential([
-        Conv2D(32, (3,3), activation='relu', input_shape=(224, 224, 1)),
-        MaxPooling2D((2, 2)),
-        Conv2D(64, (3,3), activation='relu'),
-        MaxPooling2D((2, 2)),
-        Conv2D(64, (3,3), activation='relu'),
-        Flatten(),
-        Dense(64, activation='relu'),
-        Dense(3, activation='softmax')  # 3 classes no total (covid, normal ou pneumonia)
-    ])
+    model = define_model()
 
     model.summary() 
 
-    # Compilando o modelo
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
     # early stop
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=1)
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=0.075)
 
     # Treinando o modelo
-    history = model.fit(train_images, train_labels, epochs=25, validation_split=0.1, callbacks=[callback])
+    history = model.fit(train_images, train_labels, batch_size=8, epochs=25, validation_split=0.1, callbacks=[callback])
 
     # Plotando a acurácia de treino e validação ao longo das épocas
     plt.figure(figsize=(12, 5))

@@ -25,12 +25,13 @@ from src.utils.detect_concept_drift import detect_experimet_concept_drift
 COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
 
 # Classes de interesse
-unknown_class = [OTHER_FINDINGS]
-known_classes = [COVID, NORMAL, PNEUMONIA]
+known_classes = [COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS]
 
 percents_of_unknown_samples = [5.0, 10.0, 15.0, 20.0]
 
+# Carrega e compila o modelo
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 for percentage in percents_of_unknown_samples:
     experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_data_{percentage}_other_findings.npy')
@@ -62,9 +63,7 @@ for percentage in percents_of_unknown_samples:
 
     # Escrevendo no arquivo JSON
     with open(os.path.join(EXPERIMENT_STATS_PATH, f'stats_{percentage}.json'), 'w') as f:
-        print('Salvando.......................')
         json.dump(stats, f)
-        print('Salvou.......................')
 
     # Plotando a matriz de confusão
     plt.figure(figsize=(8, 6))
@@ -77,5 +76,4 @@ for percentage in percents_of_unknown_samples:
     has_concept_drift = detect_experimet_concept_drift(stats=stats)
 
     if has_concept_drift:
-        parameters = { 'num_train_samples': None }
-        mlflow.run('.', 'train_remake_model', parameters=parameters)
+        mlflow.run('.', 'retrain_model')

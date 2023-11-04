@@ -5,52 +5,44 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.models import Model
-
-num_other_findings_train_samples = sys.argv[1]
+num_samples = sys.argv[1]
 
 # ================================================
 
 PATH_ROOT = os.getenv('PATH_ROOT')
+sys.path.append(PATH_ROOT)
+
 TRAIN_DATASET_PATH = os.getenv('TRAIN_DATASET_PATH')
+model_path = os.path.join(PATH_ROOT, 'model', 'cnn_model.h5')
+
+from src.utils.shuffle import shuffle_in_order
+from src.utils.laod_retrain_dataset import load_retrain_dataset
 
 # ================================================
 
-other_findings_train_images = np.load(os.path.join(TRAIN_DATASET_PATH, 'train_other_findings_images.npy'))
-other_findings_train_labels = np.load(os.path.join(TRAIN_DATASET_PATH, 'train_other_findings_labels.npy'))
+(covid_images, covid_labels), (normal_images, normal_labels), (pneumonia_images, pneumonia_labels), (other_findings_images, other_findings_labels) = load_retrain_dataset(num_samples)
 
-other_findings_train_images = other_findings_train_images[..., np.newaxis]
+retrained_images = np.vstack((covid_images, normal_images, pneumonia_images, other_findings_images))
+retrained_labels = np.vstack((covid_labels, normal_labels, pneumonia_labels, other_findings_labels))
 
-print('other_findings_train_images.shape: ', other_findings_train_images.shape)
-print('other_findings_train_labels.shape: ', other_findings_train_labels.shape)
+retrained_images, retrained_labels = shuffle_in_order(retrained_images, retrained_labels)
 
-model_path = os.path.join(PATH_ROOT, 'model', 'cnn_model.h5')
+print('retrained_images.shape: ', retrained_images.shape, ', retrained_labels.shape: ', retrained_labels.shape)
 
 # Carrega o modelo salvo
 model = tf.keras.models.load_model(model_path)
-
-# Remova a última camada do modelo
-model.layers.pop()
-
-# Numero de possíveis saidas
-new_outputs = 4 
-output = Dense(new_outputs, activation='softmax')(model.layers[-1].output)
-
-# Crie um novo modelo com a saída alterada
-new_model = Model(inputs=model.input, outputs=output)
 
 # summary model structure
 model.summary() 
 
 # Compilando o modelo
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # early stop
-callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=0.075)
 
 # Treinando o modelo
-history = model.fit(other_findings_train_images, other_findings_train_labels, epochs=25, validation_split=0.1, callbacks=[callback])
+history = model.fit(retrained_images, retrained_labels, batch_size=8, epochs=25, validation_split=0.1, callbacks=[callback])
 
 # Plotando a acurácia de treino e validação ao longo das épocas
 plt.figure(figsize=(12, 5))
@@ -78,4 +70,4 @@ plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'retrained_loss_graph.png'
 # Se você quiser salvar o modelo após o treinamento, você pode fazer isso:
 model.save(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
-mlflow.run(uri='.', entry_point='experiments_remake', parameters={ 'num_other_findings_train_samples': num_other_findings_train_samples })
+mlflow.run(uri='.', entry_point='retest_model_retrained', parameters={ 'num_samples': num_samples + num_samples })
