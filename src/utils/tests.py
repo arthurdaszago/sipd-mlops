@@ -13,7 +13,7 @@ def load_test_stats():
 
 
 def load_test_stats_remaked():
-    remaked_test_stats_path = os.path.join(TEST_STATS_PATH, 'retrain_stats.json')
+    remaked_test_stats_path = os.path.join(TEST_STATS_PATH, 'retest_stats.json')
     remaked_test_stats = open_file(remaked_test_stats_path)
 
     return remaked_test_stats

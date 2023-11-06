@@ -1,11 +1,22 @@
 import os
+import gc
 import sys
 import mlflow
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-num_samples = sys.argv[1]
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+  # Invalid device or cannot modify virtual devices once initialized.
+  pass
+
+
+print('sys.argv: ', sys.argv)
+
+tax_samples = float(sys.argv[1])
 
 # ================================================
 
@@ -20,10 +31,10 @@ from src.utils.laod_retrain_dataset import load_retrain_dataset
 
 # ================================================
 
-(covid_images, covid_labels), (normal_images, normal_labels), (pneumonia_images, pneumonia_labels), (other_findings_images, other_findings_labels) = load_retrain_dataset(num_samples)
+(covid_images, covid_labels), (normal_images, normal_labels), (pneumonia_images, pneumonia_labels), (other_findings_images, other_findings_labels) = load_retrain_dataset(tax_samples)
 
-retrained_images = np.vstack((covid_images, normal_images, pneumonia_images, other_findings_images))
-retrained_labels = np.vstack((covid_labels, normal_labels, pneumonia_labels, other_findings_labels))
+retrained_images = np.concatenate((covid_images, normal_images, pneumonia_images, other_findings_images), axis=0)
+retrained_labels = np.concatenate((covid_labels, normal_labels, pneumonia_labels, other_findings_labels), axis=0)
 
 retrained_images, retrained_labels = shuffle_in_order(retrained_images, retrained_labels)
 
@@ -41,8 +52,11 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 # early stop
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=0.075)
 
+# Supondo que seus rótulos são inteiros de 0 a 3
+retrained_labels_one_hot = tf.keras.utils.to_categorical(retrained_labels, num_classes=4)
+
 # Treinando o modelo
-history = model.fit(retrained_images, retrained_labels, batch_size=8, epochs=25, validation_split=0.1, callbacks=[callback])
+history = model.fit(retrained_images, retrained_labels_one_hot, batch_size=8, epochs=10, validation_split=0.1, callbacks=[callback], verbose=1)
 
 # Plotando a acurácia de treino e validação ao longo das épocas
 plt.figure(figsize=(12, 5))
@@ -70,4 +84,4 @@ plt.savefig(os.path.join(PATH_ROOT, 'stats', 'train', 'retrained_loss_graph.png'
 # Se você quiser salvar o modelo após o treinamento, você pode fazer isso:
 model.save(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
-mlflow.run(uri='.', entry_point='retest_model_retrained', parameters={ 'num_samples': num_samples + num_samples })
+mlflow.run(uri='.', entry_point='retest_model_retrained', parameters={ 'tax_samples': tax_samples })

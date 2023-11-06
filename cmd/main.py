@@ -5,16 +5,16 @@ import mlflow
 import click
 import os
 
-PATH_ROOT = os.environ['PATH_ROOT'] = "/home/arthur/Documents/ifc/tc/code/sipd-mlops"
+PATH_ROOT = os.environ['PATH_ROOT'] = "/home/azago/sipd-mlops-code/sipd-mlops"
 
 os.environ['TEST_STATS_PATH'] = f"{PATH_ROOT}/stats/test"
 os.environ['TEST_DATASET_PATH'] = f"{PATH_ROOT}/datasets/test"
 os.environ['TEST_DATASET_PATH'] = f"{PATH_ROOT}/datasets/test"
 os.environ['TRAIN_DATASET_PATH'] = f"{PATH_ROOT}/datasets/train"
-os.environ['DATASET_PATH'] = "/home/arthur/Documents/dataset"
-os.environ['DATASET2_PATH'] = "/home/arthur/Documents/dataset2"
-os.environ['EXPERIMENT_STATS_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/stats/experiments'
-os.environ['EXPERIMENTS_DATASET_PATH'] = '/home/arthur/Documents/ifc/tc/code/sipd-mlops/datasets/experiments'
+os.environ['DATASET_PATH'] = "/home/azago/dataset"
+os.environ['DATASET2_PATH'] = "/home/azago/dataset2"
+os.environ['EXPERIMENT_STATS_PATH'] = f'{PATH_ROOT}/stats/experiments'
+os.environ['EXPERIMENTS_DATASET_PATH'] = f'{PATH_ROOT}/datasets/experiments'
 
 def _run(entrypoint, parameters=dict(), source_version = None, use_cache = True):
     """Launching new run for an entrypoint"""
@@ -35,7 +35,7 @@ def workflow():
         mlflow.set_tag("mlflow.runName", "pipeline")
 
         # dataset pipeline
-        # _run("prepare_train_and_test_dataset")
+        _run("prepare_train_and_test_dataset")
         _run("prepare_experiments_dataset")
 
         # # model pipeline
@@ -58,6 +58,6 @@ if __name__ == "__main__":
     try:
         workflow()
     except Exception as e:
-        print("Exception occured. Check logs.")
+        print("Exception occured. Check logs: ", e.message)
         logger.error(f"Failed to run workflow due to error:\n{e}")
         logger.error(traceback.format_exc())

@@ -7,7 +7,15 @@ import seaborn as sns
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+  # Invalid device or cannot modify virtual devices once initialized.
+  pass
+
+
+from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
 
 # ================================================
 
@@ -27,15 +35,17 @@ COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
 # Classes de interesse
 known_classes = [COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS]
 
-percents_of_unknown_samples = [5.0, 10.0, 15.0, 20.0]
+percents_of_unknown_samples = [10.0, 20.0, 30.0, 40.0]
+
+pass
 
 # Carrega e compila o modelo
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 for percentage in percents_of_unknown_samples:
-    experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_data_{percentage}_other_findings.npy')
-    experiment_labels_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'test_label_{percentage}_other_findings.npy')
+    experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'experiment_images_{percentage}_infiltration.npy')
+    experiment_labels_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'experiment_labels_{percentage}_infiltration.npy')
 
     experiment_images = np.load(experiment_images_path)
     experiment_labels = np.load(experiment_labels_path)
@@ -52,9 +62,12 @@ for percentage in percents_of_unknown_samples:
 
     # Calculando a matriz de confusão
     conf_matrix = confusion_matrix(experiment_labels, predicted_labels, labels=known_classes)
+    m_conf_matrix = multilabel_confusion_matrix(experiment_labels, predicted_labels, labels=known_classes)
 
     # Escrevendo no arquivo JSON
     stats = {
+        "confusion-matrix": conf_matrix.tolist(),
+        "multilabel-confusion-marix": m_conf_matrix.tolist(),
         "Accuracy": round(accuracy_score(experiment_labels, predicted_labels), 5),
         "Recall": round(recall_score(experiment_labels, predicted_labels, average='macro'), 5),
         "Precision": round(precision_score(experiment_labels, predicted_labels, average='macro'), 5),
@@ -76,4 +89,4 @@ for percentage in percents_of_unknown_samples:
     has_concept_drift = detect_experimet_concept_drift(stats=stats)
 
     if has_concept_drift:
-        mlflow.run('.', 'retrain_model')
+        mlflow.run('.', 'retrain_model', parameters={'tax_samples': round(percentage / 100, 1)})

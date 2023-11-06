@@ -8,7 +8,7 @@ COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
 # num of total samples
 total_samples = 2000
 # percent of unknown samples to add in experiment
-percentages = [0.05, 0.1, 0.15, 0.2]
+percentages = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 
 # ================================================
 
@@ -36,6 +36,7 @@ mask_known_labels = np.isin(test_labels, [COVID, NORMAL, PNEUMONIA])
 known_test_labels = test_labels[(test_labels == COVID) | (test_labels ==  NORMAL) | (test_labels ==  PNEUMONIA)]
 known_test_images = test_images[(test_labels == COVID) | (test_labels ==  NORMAL) | (test_labels ==  PNEUMONIA)]
 
+print('known_test_labels:, ', np.unique(known_test_labels))
 print('known_test_images.shape: ', known_test_images.shape)
 print('known_test_labels.shape: ', known_test_labels.shape)
 

@@ -68,6 +68,11 @@ def load_train_dataset():
             file_path = os.path.join(train_dataset_path, train_folder, file)
 
             image = cv2.imread(file_path)
+            if image is None:
+                # print some err
+                continue
+
+            image = cv2.resize(image, (224, 224))
             np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)
@@ -101,6 +106,11 @@ def load_test_dataset():
             file_path = os.path.join(test_dataset_path, test_folder, file)
 
             image = cv2.imread(file_path)
+            if image is None:
+                print('iamge error: ', file_path)
+                continue
+
+            image = cv2.resize(image, (224, 224))
             np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)

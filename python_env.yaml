@@ -9,7 +9,7 @@ build_dependencies:
 # Dependencies required to run the project.
 dependencies:
   - mlflow==2.7
-  - tensorflow==2.12
+  - tensorflow==2.14
   - seaborn
   - tqdm
   - opencv-python

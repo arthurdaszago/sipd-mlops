@@ -2,8 +2,9 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 
 def define_model():
+    print('opa')
         # Define o modelo Sequential
-    model = models.Sequential()
+    model = tf.keras.Sequential()
 
     # Define o input shape
     input_shape = (224, 224, 3)  # Ajuste o input_shape conforme necessário
