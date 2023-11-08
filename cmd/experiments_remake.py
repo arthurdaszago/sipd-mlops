@@ -19,6 +19,9 @@ from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, recal
 
 # ================================================
 
+# Nomes das classes
+classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
+
 PATH_ROOT = os.getenv('PATH_ROOT')
 EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
 EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
@@ -31,16 +34,13 @@ from src.utils.detect_concept_drift import detect_experiment_remake_concept_drif
 
 # ================================================
 
-percents_of_unknown_samples = [10.0, 20.0, 30.0, 40.0]
+percents_of_unknown_samples = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0]
 
 # Carrega e compila o modelo
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 for percentage in percents_of_unknown_samples:
-    if percentage / 100 > tax_samples:
-        continue
-
     experiment_images_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'experiment_images_{percentage}_infiltration.npy')
     experiment_labels_path = os.path.join(EXPERIMENTS_DATASET_PATH, f'experiment_labels_{percentage}_infiltration.npy')
 
@@ -77,14 +77,14 @@ for percentage in percents_of_unknown_samples:
 
     # Plotando a matriz de confusão
     plt.figure(figsize=(8, 6))
-    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-    plt.xlabel('Predicted Label')
-    plt.ylabel('True Label')
-    plt.title('Confusion Matrix')
+    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    plt.xlabel('Predito')
+    plt.ylabel('Verdadeiro')
+    plt.title('Matriz de confusão')
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'retrained_confusion_matrix_{percentage}.png'))
 
-    has_concept_drift = detect_experiment_remake_concept_drift(stats=stats)
+    # has_concept_drift = detect_experiment_remake_concept_drift(stats=stats)
 
-    if has_concept_drift:
-        parameters = { 'tax_samples': tax_samples }
-        mlflow.run('.', entry_point='retrain_model', parameters=parameters)
+    # if has_concept_drift:
+    #     parameters = { 'tax_samples': tax_samples }
+    #     mlflow.run('.', entry_point='retrain_model', parameters=parameters)

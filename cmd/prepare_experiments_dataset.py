@@ -8,7 +8,7 @@ COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
 # num of total samples
 total_samples = 2000
 # percent of unknown samples to add in experiment
-percentages = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+percentages = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 # ================================================
 

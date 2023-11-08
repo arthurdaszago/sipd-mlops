@@ -13,33 +13,12 @@ except:
   # Invalid device or cannot modify virtual devices once initialized.
   pass
 
-
 from sklearn.metrics import confusion_matrix,multilabel_confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
 
-COVID, NORMAL, PNEUMONIA, OTHER_FINDING = range(4)
-
-def separete_classes(train_images, train_labels):
-    # Aqui vamos usar as máscaras diretamente nos rótulos
-    mask_covid = train_labels == COVID
-    mask_normal = train_labels == NORMAL
-    mask_pneumonia = train_labels == PNEUMONIA
-    mask_other_findings = train_labels == OTHER_FINDING
-
-    # Agora, usamos as máscaras para selecionar as imagens correspondentes
-    covid_images = train_images[mask_covid]
-    normal_images = train_images[mask_normal]
-    pneumonia_images = train_images[mask_pneumonia]
-    other_findings_images = train_images[mask_other_findings]
-
-    covid_labels = train_labels[mask_covid]
-    normal_labels = train_labels[mask_normal]
-    pneumonia_labels = train_labels[mask_pneumonia]
-    other_findings_labels = train_labels[mask_other_findings]
-
-    return (covid_images, covid_labels), (normal_images, normal_labels), (pneumonia_images, pneumonia_labels), (other_findings_images, other_findings_labels)
-
-
 # ================================================
+
+# Nomes das classes
+classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
@@ -49,10 +28,6 @@ TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
 
 test_images = np.load(os.path.join(TEST_DATASET_PATH, 'test_images.npy'))
 test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'test_labels.npy'))
-
-(covid_images, covid_labels), (normal_images, normal_labels), (pneumonia_images, pneumonia_labels), (other_findings_images, other_findings_labels) = separete_classes(test_images, test_labels)
-
-pass
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model.h5'))
 
@@ -83,8 +58,8 @@ with open(os.path.join(TEST_STATS_PATH, 'stats.json'), 'w') as f:
 
 # Plotando a matriz de confusão
 plt.figure(figsize=(8, 6))
-sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-plt.title('Confusion Matrix')
+sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
+plt.xlabel('Predito')
+plt.ylabel('Verdadeiro')
+plt.title('Matriz de confusão')
 plt.savefig(os.path.join(TEST_STATS_PATH, 'confusion_matrix.png'))

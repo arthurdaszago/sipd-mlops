@@ -19,6 +19,9 @@ from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, recal
 
 # ================================================
 
+# Nomes das classes
+classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
+
 PATH_ROOT = os.getenv('PATH_ROOT')
 EXPERIMENT_STATS_PATH = os.getenv('EXPERIMENT_STATS_PATH')
 EXPERIMENTS_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
@@ -80,10 +83,10 @@ for percentage in percents_of_unknown_samples:
 
     # Plotando a matriz de confusão
     plt.figure(figsize=(8, 6))
-    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-    plt.xlabel('Predicted Label')
-    plt.ylabel('True Label')
-    plt.title('Confusion Matrix')
+    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    plt.xlabel('Predito')
+    plt.ylabel('Verdadeiro')
+    plt.title('Matriz de confusão')
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'confusion_matrix_{percentage}.png'))
 
     has_concept_drift = detect_experimet_concept_drift(stats=stats)
