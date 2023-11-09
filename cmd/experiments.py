@@ -82,13 +82,14 @@ for percentage in percents_of_unknown_samples:
         json.dump(stats, f)
 
     # Plotando a matriz de confusão
-    plt.rc('font', size=12)
+    plt.rc('font', size=14)
     sns.set_context('talk')
     plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes, annot_kws={"size": 17})
-    plt.xlabel('Predito', fontsize=14)
-    plt.ylabel('Verdadeiro', fontsize=14)
+    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes, annot_kws={"size": 18})
+    plt.xlabel('Predito', fontsize=20)
+    plt.ylabel('Verdadeiro', fontsize=20)
     plt.title(f'MC: {round(percentage / 4, 1)}% de amostras desconhecidas', fontsize=20)
+    plt.tight_layout()
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'confusion_matrix_{percentage}.png'))
 
     has_concept_drift = detect_experimet_concept_drift(stats=stats)
