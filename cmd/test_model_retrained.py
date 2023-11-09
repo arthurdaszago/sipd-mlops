@@ -20,6 +20,8 @@ from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, recal
 
 # ================================================
 
+classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
+
 PATH_ROOT = os.getenv('PATH_ROOT')
 TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
 TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
@@ -60,10 +62,10 @@ with open(os.path.join(TEST_STATS_PATH, 'retest_stats.json'), 'w') as f:
 
 # Plotando a matriz de confusão
 plt.figure(figsize=(8, 6))
-sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-plt.title('Confusion Matrix')
+sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
+plt.xlabel('Predito')
+plt.ylabel('Verdadeiro')
+plt.title('Matriz de confusão')
 plt.savefig(os.path.join(TEST_STATS_PATH, 'retest_confusion_matrix.png'))
 
 parameters = { 'tax_samples': tax_samples }

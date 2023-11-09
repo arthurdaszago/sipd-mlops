@@ -86,7 +86,7 @@ for percentage in percents_of_unknown_samples:
     sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
     plt.xlabel('Predito')
     plt.ylabel('Verdadeiro')
-    plt.title('Matriz de confusão')
+    plt.title(f'Matriz de confusão: {int(percentage)}% de amostras de infitração em outras doenças')
     plt.savefig(os.path.join(EXPERIMENT_STATS_PATH, f'confusion_matrix_{percentage}.png'))
 
     has_concept_drift = detect_experimet_concept_drift(stats=stats)
