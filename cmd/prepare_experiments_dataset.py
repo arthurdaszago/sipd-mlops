@@ -3,11 +3,20 @@ import sys
 import numpy as np
 
 # ================================================
+COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
+
+# num of total samples
+total_samples = 2000
+# percent of unknown samples to add in experiment
+percentages = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+# ================================================
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 sys.path.append(PATH_ROOT)
 
-from src.utils.load_dataset import load_dataset
+from src.utils.load_dataset import load_dataset, shuffle_in_order
+from src.utils.load_infiltration_dataset import load_dataset as load_infiltration_dataset
 
 # ================================================
 
@@ -16,72 +25,48 @@ print("Iniciando preparação de datasets de experimentos.")
 print('======================================================')
 
 _, (test_images, test_labels) = load_dataset()
+_, (test_infiltration_images, test_infiltration_labels) = load_infiltration_dataset()
 
-# Definindo os índices das classes no dataset
-COVID, NORMAL, PNEUMONIA, OTHER_FINDINGS = range(4)
+print('test_images.shape: ', test_images.shape, ', test_labels.shape: ', test_labels.shape)
+print('test_infiltration_images.shape: ', test_infiltration_images.shape, ', test_infiltration_labels.shape: ', test_infiltration_labels.shape)
 
-# Classes de interesse
-unknown_class = [OTHER_FINDINGS]
-known_classes = [COVID, NORMAL, PNEUMONIA]
+mask_known_images = np.isin(test_images, [COVID, NORMAL, PNEUMONIA])
+mask_known_labels = np.isin(test_labels, [COVID, NORMAL, PNEUMONIA])
 
-# percent of unknown samples to add in experiment
-percentages = [0.05, 0.1, 0.15, 0.2]
+known_test_labels = test_labels[(test_labels == COVID) | (test_labels ==  NORMAL) | (test_labels ==  PNEUMONIA)]
+known_test_images = test_images[(test_labels == COVID) | (test_labels ==  NORMAL) | (test_labels ==  PNEUMONIA)]
 
-# num of total samples
-total_samples = 1500
+print('known_test_labels:, ', np.unique(known_test_labels))
+print('known_test_images.shape: ', known_test_images.shape)
+print('known_test_labels.shape: ', known_test_labels.shape)
 
-mask_unknown = np.isin(test_labels, unknown_class)
+other_finding_test_images = test_images[(test_labels == OTHER_FINDINGS)]
+other_finding_test_labels = test_labels[(test_labels == OTHER_FINDINGS)]
 
-# all "other finding" samples
-other_finding_images_samples = test_images[mask_unknown.squeeze()]
-other_finding_labels_samples = test_labels[mask_unknown.squeeze()]
+print('other_finding_test_images.shape: ', other_finding_test_images.shape)
+print('other_finding_test_labels.shape: ', other_finding_test_labels.shape)
 
 for percentage in percentages:
-    samples_per_class = int((total_samples / len(known_classes)) - (percentage * total_samples / len(known_classes)))
-    print('samples_per_class: ', samples_per_class)
+    num_samples_by_percent = int(percentage * (total_samples // 4))
+    print('num_samples_by_percent: ', num_samples_by_percent)
 
-    images_list = []
-    labels_list = []
+    other_finding_images = other_finding_test_images[num_samples_by_percent:500]
+    other_finding_labels = other_finding_test_labels[num_samples_by_percent:500]
 
-    # Adicionando classes individuais
-    for label in known_classes:
-        mask = test_labels.squeeze() == label
-        samples = test_images[mask][:samples_per_class]
-        images_list.append(samples)
-        labels_list.append(np.full((samples_per_class, 1), label))
+    infiltration_images = test_infiltration_images[:num_samples_by_percent]
+    infiltration_labels = test_infiltration_labels[:num_samples_by_percent]
 
-    # Adicionando classe desconhecida "others findings"
-    num_unknown_samples = int(percentage * total_samples)
-
-    # Determinar a quantidade de amostras em cada terço
-    third_samples = num_unknown_samples // 3
-
-    # Adicionar imagens e rótulos para o label 0
-    images_list.append(other_finding_images_samples[:third_samples])
-    labels_list.append(np.full((third_samples, 1), 0))
-
-    print('other_finding_images_samples[:third_samples]: ', other_finding_images_samples[:third_samples].shape)
-
-    # Adicionar imagens e rótulos para o label 1
-    images_list.append(other_finding_images_samples[third_samples:2*third_samples])
-    labels_list.append(np.full((third_samples, 1), 1))
-
-    print('other_finding_images_samples[third_samples:2*third_samples]: ', other_finding_images_samples[third_samples:2*third_samples].shape)
-
-    # Adicionar imagens e rótulos para o label 2
-    images_list.append(other_finding_images_samples[2*third_samples:3*third_samples])
-    labels_list.append(np.full((third_samples, 1), 2))
-
-    print('other_finding_images_samples[2*third_samples:3*third_samples]: ', other_finding_images_samples[2*third_samples:3*third_samples].shape)
-
-    print('other_finding_images_samples[:num_unknown_samples]: ', other_finding_images_samples[:num_unknown_samples].shape)
+    print('known_test_images[:1500].shape: ', known_test_images.shape[:1500], ', other_finding_images.shape:', other_finding_images.shape, ', infiltration_images.shape:', infiltration_images.shape)
+    print('known_test_labels.shape: ', known_test_labels.shape, ', other_finding_labels.shape:', other_finding_labels.shape, ', infiltration_labels.shape:', infiltration_labels.shape)
 
     # Salvando
-    final_images = np.vstack(images_list)
-    final_labels = np.vstack(labels_list)
+    final_images = np.concatenate((known_test_images[:1500], other_finding_images, infiltration_images), axis=0)
+    final_labels = np.concatenate((known_test_labels[:1500], other_finding_labels, infiltration_labels), axis=0)
 
-    print('final_images: ', final_images.shape)    
-    print('final_labels: ', final_labels.shape)    
+    print('final_images: ', final_images.shape)
+    print('final_labels: ', final_labels.shape)
+    
+    final_images, final_labels = shuffle_in_order(images=final_images, labels=final_labels)
 
     # Contando e exibindo o número de amostras para cada classe
     unique_labels, counts = np.unique(final_labels, return_counts=True)
@@ -89,7 +74,9 @@ for percentage in percentages:
         class_name = [ 'COVID', 'NORMAL', 'PNEUMONIA', 'OTHER_FINDINGS' ][ulabel]
         print(f"For {int(percentage*100)}% frogs: Number of samples for {class_name}: {count}")
 
-    np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'test_data_{percentage*100}_other_findings.npy'), final_images)
-    np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'test_label_{percentage*100}_other_findings.npy'), final_labels)
+    np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'experiment_images_{percentage*100}_infiltration.npy'), final_images)
+    np.save(os.path.join(PATH_ROOT, 'datasets', 'experiments', f'experiment_labels_{percentage*100}_infiltration.npy'), final_labels)
 
-print("Datasets de experimentos preparados.")
+print('======================================================')
+print("tERMINADO preparação de datasets de experimentos.")
+print('======================================================')

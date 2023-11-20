@@ -1,25 +1,42 @@
 
 import os
+import sys
 import json
+import mlflow
 import numpy as np
 import tensorflow as tf
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+  # Invalid device or cannot modify virtual devices once initialized.
+  pass
+
+
+from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, recall_score, accuracy_score, precision_score, f1_score
 
 # ================================================
+
+classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
 TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
 
+tax_samples = float(sys.argv[1])
+
 # ================================================
 
-test_images = np.load(os.path.join(TEST_DATASET_PATH, 'validation_images.npy'))
-test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'validation_labels.npy'))
+test_images = np.load(os.path.join(TEST_DATASET_PATH, 'test_images.npy'))
+test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'test_labels.npy'))
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
+
+# Compilando o modelo
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Testando o modelo
 predictions = model.predict(test_images)
@@ -27,32 +44,16 @@ predicted_labels = np.argmax(predictions, axis=1)
 
 # Calculando a matriz de confusão
 conf_matrix = confusion_matrix(test_labels, predicted_labels)
-
-# Calculando acurácia
-accuracy = np.trace(conf_matrix) / float(np.sum(conf_matrix))
-
-# Micro-average calculation
-tp_total = np.sum(np.diag(conf_matrix))  # Sum of diagonal elements gives total true positives
-fp_total = np.sum(np.sum(conf_matrix, axis=0) - np.diag(conf_matrix))  # Sum of columns minus diagonal
-fn_total = np.sum(np.sum(conf_matrix, axis=1) - np.diag(conf_matrix))  # Sum of rows minus diagonal
-tn_total = np.sum(conf_matrix) - (tp_total + fp_total + fn_total)
-
-# Para multiclasse, vamos calcular TPR e TNR para cada classe e armazená-los em listas
-tpr_micro = tp_total / (tp_total + fn_total)
-tnr_micro = tn_total / (tn_total + fp_total)
+m_conf_matrix = multilabel_confusion_matrix(test_labels, predicted_labels)
 
 # Escrevendo no arquivo JSON
 stats = {
-    'TPR': tpr_micro,
-    'TNR': tnr_micro,
-    'accuracy': accuracy,
-    'confusion_matrix': {
-        'tp': tp_total,
-        'fp': fp_total,
-        'fn': fn_total,
-        'tn': tn_total,
-        'list': conf_matrix.tolist(),
-    },
+    "confusion-matrix": conf_matrix.tolist(),
+    "multilabel-confusion-marix": m_conf_matrix.tolist(),
+    "Accuracy": round(accuracy_score(test_labels, predicted_labels), 5),
+    "Recall": round(recall_score(test_labels, predicted_labels, average='macro'), 5),
+    "Precision": round(precision_score(test_labels, predicted_labels, average='macro'), 5),
+    "F1-Score": round(f1_score(test_labels, predicted_labels, average='macro'), 5),
 }
 
 # Escrevendo no arquivo JSON
@@ -61,8 +62,11 @@ with open(os.path.join(TEST_STATS_PATH, 'retest_stats.json'), 'w') as f:
 
 # Plotando a matriz de confusão
 plt.figure(figsize=(8, 6))
-sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-plt.xlabel('Predicted Label')
-plt.ylabel('True Label')
-plt.title('Confusion Matrix')
+sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', xticklabels=classes, yticklabels=classes)
+plt.xlabel('Predito')
+plt.ylabel('Verdadeiro')
+plt.title('Matriz de confusão')
 plt.savefig(os.path.join(TEST_STATS_PATH, 'retest_confusion_matrix.png'))
+
+parameters = { 'tax_samples': tax_samples }
+mlflow.run('.', entry_point='remake_experiments', parameters=parameters)

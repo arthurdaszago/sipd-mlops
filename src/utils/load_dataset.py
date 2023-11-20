@@ -1,7 +1,8 @@
 import os
+import cv2
 import numpy as np
 
-from PIL import Image
+from tqdm import tqdm
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 DATASET_PATH = os.getenv('DATASET_PATH')
@@ -59,14 +60,20 @@ def load_train_dataset():
     images = []
     labels = []
 
-    for train_folder in train_folders:
+    for train_folder in tqdm(train_folders, desc="Carregando dataset de treino"):
         cur_path = os.path.join(train_dataset_path, train_folder)
+        print('train_folder: ', train_folder)
 
-        for file in os.listdir(cur_path):
+        for file in tqdm(os.listdir(cur_path), desc=f"Lendo {train_folder}"):
             file_path = os.path.join(train_dataset_path, train_folder, file)
 
-            image = Image.open(file_path)
-            np_image = np.asarray(image)
+            image = cv2.imread(file_path)
+            if image is None:
+                # print some err
+                continue
+
+            image = cv2.resize(image, (224, 224))
+            np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)
 
@@ -91,14 +98,20 @@ def load_test_dataset():
     images = []
     labels = []
 
-    for test_folder in test_folders:
+    for test_folder in  tqdm(test_folders, desc="Carregando dataset de teste"):
         cur_path = os.path.join(test_dataset_path, test_folder)
+        print('test_folder: ', test_folder)
 
-        for file in os.listdir(cur_path):
+        for file in tqdm(os.listdir(cur_path), desc=f"Lendo {test_folder}"):
             file_path = os.path.join(test_dataset_path, test_folder, file)
 
-            image = Image.open(file_path)
-            np_image = np.asarray(image)
+            image = cv2.imread(file_path)
+            if image is None:
+                print('iamge error: ', file_path)
+                continue
+
+            image = cv2.resize(image, (224, 224))
+            np_image = np.asarray(image, dtype=np.uint8)
 
             images.append(np_image)
 
@@ -124,9 +137,6 @@ def shuffle_in_order(images, labels):
 
 if __name__ == '__main__':
     (train_images, train_labels), (test_images, test_labels) = load_dataset()
-
-    (train_images, train_labels) = shuffle_in_order(train_images, train_labels)
-    (test_images, test_labels) = shuffle_in_order(train_images, train_labels)
 
     print('train: ', train_images.shape, train_labels.shape)
     print('test: ', test_images.shape, test_labels.shape)
