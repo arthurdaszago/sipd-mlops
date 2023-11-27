@@ -24,14 +24,15 @@ classes = ['COVID', 'Normal', 'Pneumonia', 'Outras Doenças']
 
 PATH_ROOT = os.getenv('PATH_ROOT')
 TEST_STATS_PATH = os.getenv('TEST_STATS_PATH')
-TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
+# TEST_DATASET_PATH = os.getenv('TEST_DATASET_PATH')
+TEST_40_DATASET_PATH = os.getenv('EXPERIMENTS_DATASET_PATH')
 
 tax_samples = float(sys.argv[1])
 
 # ================================================
 
-test_images = np.load(os.path.join(TEST_DATASET_PATH, 'test_images.npy'))
-test_labels = np.load(os.path.join(TEST_DATASET_PATH, 'test_labels.npy'))
+test_images = np.load(os.path.join(TEST_40_DATASET_PATH, 'experiment_images_40.0_infiltration.npy'))
+test_labels = np.load(os.path.join(TEST_40_DATASET_PATH, 'experiment_labels_40.0_infiltration.npy'))
 
 model = tf.keras.models.load_model(os.path.join(PATH_ROOT, 'model', 'cnn_model_retrained.h5'))
 
